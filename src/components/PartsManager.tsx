@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { ProjectPart, Chipboard, PartFormData } from '../types';
 
@@ -21,6 +22,7 @@ function PartsManager({
   onRunPlacement,
   hasPlacement,
 }: PartsManagerProps) {
+  const { t } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -131,9 +133,9 @@ function PartsManager({
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700">
-        <h2 className="text-2xl font-bold text-white">Parts Manager</h2>
+        <h2 className="text-2xl font-bold text-white">{t('partsManager.title')}</h2>
         <p className="text-blue-100 mt-1">
-          {parts.length} types • {totalParts} total parts
+          {parts.length} {t('common.types', 'types')} • {totalParts} {t('partsManager.totalParts').toLowerCase()}
         </p>
       </div>
 
@@ -143,7 +145,7 @@ function PartsManager({
             onClick={() => setShowAddForm(true)}
             className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
-            + Add Part
+            + {t('partsManager.addPart')}
           </button>
         )}
 
@@ -151,13 +153,13 @@ function PartsManager({
           <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg space-y-3">
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Part Name (optional)
+                {t('partsManager.partName')}
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => updateFormData({ name: e.target.value })}
-                placeholder="e.g., Shelf, Door..."
+                placeholder={t('partsManager.partNamePlaceholder')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
             </div>
@@ -165,7 +167,7 @@ function PartsManager({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Width (mm)
+                  {t('partsManager.width')}
                 </label>
                 <input
                   type="number"
@@ -178,7 +180,7 @@ function PartsManager({
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Height (mm)
+                  {t('partsManager.height')}
                 </label>
                 <input
                   type="number"
@@ -193,7 +195,7 @@ function PartsManager({
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Quantity
+                {t('partsManager.quantity')}
               </label>
               <input
                 type="number"
@@ -214,13 +216,13 @@ function PartsManager({
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
               <label htmlFor="canRotate" className="ml-2 text-sm text-gray-700">
-                Allow rotation
+                {t('partsManager.allowRotation')}
               </label>
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">
-                PVC Edge Banding
+                {t('partsManager.pvcEdgeBanding')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex items-center">
@@ -232,7 +234,7 @@ function PartsManager({
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-top" className="ml-2 text-sm text-gray-700">
-                    Top
+                    {t('partsManager.top')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -244,7 +246,7 @@ function PartsManager({
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-right" className="ml-2 text-sm text-gray-700">
-                    Right
+                    {t('partsManager.right')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -256,7 +258,7 @@ function PartsManager({
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-bottom" className="ml-2 text-sm text-gray-700">
-                    Bottom
+                    {t('partsManager.bottom')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -268,7 +270,7 @@ function PartsManager({
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-left" className="ml-2 text-sm text-gray-700">
-                    Left
+                    {t('partsManager.left')}
                   </label>
                 </div>
               </div>
@@ -290,7 +292,7 @@ function PartsManager({
                 type="submit"
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
               >
-                {editingId ? 'Update' : 'Add'}
+                {editingId ? t('partsManager.update') : t('partsManager.add')}
               </button>
               <button
                 type="button"
@@ -300,7 +302,7 @@ function PartsManager({
                 }}
                 className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium"
               >
-                Cancel
+                {t('partsManager.cancel')}
               </button>
             </div>
           </form>
@@ -326,7 +328,7 @@ function PartsManager({
                   <button
                     onClick={() => handleEdit(part)}
                     className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                    title="Edit"
+                    title={t('partsManager.edit')}
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -335,7 +337,7 @@ function PartsManager({
                   <button
                     onClick={() => onDeletePart(part.id)}
                     className="p-1 text-red-600 hover:bg-red-50 rounded"
-                    title="Delete"
+                    title={t('partsManager.delete')}
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -352,7 +354,7 @@ function PartsManager({
             onClick={onRunPlacement}
             className="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-medium text-lg shadow-md"
           >
-            {hasPlacement ? 'Recalculate Placement' : 'Run Placement'}
+            {t('partsManager.runPlacement')}
           </button>
         )}
       </div>

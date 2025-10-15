@@ -3,6 +3,9 @@ import { initReactI18next } from 'react-i18next';
 import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+// Get the base path from the environment or use root
+const base = import.meta.env.BASE_URL || '/';
+
 i18n
   .use(HttpBackend) // Load translations from /public/locales
   .use(LanguageDetector) // Detect user language
@@ -16,7 +19,7 @@ i18n
     },
 
     backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      loadPath: `${base}locales/{{lng}}/{{ns}}.json`,
     },
 
     detection: {

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { Project, Chipboard, ProjectPart, PlacementResult } from './types';
 import ProjectSetup from './components/ProjectSetup';
@@ -10,6 +11,7 @@ import { optimizePlacement } from './utils/placement';
 import { exportProjectToCSV, importProjectFromCSV, downloadCSV } from './utils/projectIO';
 
 function App() {
+  const { t } = useTranslation();
   const [project, setProject] = useState<Project | null>(null);
   const [showSetup, setShowSetup] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
@@ -178,7 +180,7 @@ function App() {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                 </svg>
-                Save
+                {t('app.save')}
               </button>
               <button
                 onClick={handleLoadProject}
@@ -188,7 +190,7 @@ function App() {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                Load
+                {t('app.load')}
               </button>
               <button
                 onClick={() => setShowSettings(true)}
@@ -199,14 +201,14 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Settings
+                {t('app.settings')}
               </button>
               <button
                 onClick={handleNewProject}
                 className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                 title="Create new project"
               >
-                New Project
+                {t('app.newProject')}
               </button>
               </div>
             </div>

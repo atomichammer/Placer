@@ -93,7 +93,8 @@
   "common": {
     "mm": "mm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "types": "types"
   },
   "validation": {
     "partTooLarge": "Part dimensions ({{width}} × {{height}} mm) are too large for the chipboard!",
