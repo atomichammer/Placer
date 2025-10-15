@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ProjectPart, Chipboard, PvcEdges } from '../types';
+import { ProjectPart, Chipboard, PartFormData } from '../types';
 
 interface PartsManagerProps {
   parts: ProjectPart[];
@@ -25,16 +25,12 @@ function PartsManager({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   
-  const [partName, setPartName] = useState('');
-  const [partWidth, setPartWidth] = useState(100);
-  const [partHeight, setPartHeight] = useState(100);
-  const [partCanRotate, setPartCanRotate] = useState(true);
-  const [partCount, setPartCount] = useState(1);
-  const [pvcEdges, setPvcEdges] = useState<PvcEdges>({
-    top: false,
-    right: false,
-    bottom: false,
-    left: false,
+  const [formData, setFormData] = useState<PartFormData>({
+    name: '',
+    dimensions: { width: 100, height: 100 },
+    canRotate: true,
+    count: 1,
+    pvcEdges: { top: false, right: false, bottom: false, left: false },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -44,16 +40,18 @@ function PartsManager({
     const availableWidth = chipboard.dimensions.width - 2 * chipboard.margin;
     const availableHeight = chipboard.dimensions.height - 2 * chipboard.margin;
     
+    const { width, height } = formData.dimensions;
+    
     // Check if part can fit in any orientation
-    const fitsNormal = partWidth <= availableWidth && partHeight <= availableHeight;
-    const fitsRotated = partCanRotate && partHeight <= availableWidth && partWidth <= availableHeight;
+    const fitsNormal = width <= availableWidth && height <= availableHeight;
+    const fitsRotated = formData.canRotate && height <= availableWidth && width <= availableHeight;
     
     if (!fitsNormal && !fitsRotated) {
       // Part is too large to fit on the chipboard
       const maxDimension = Math.max(availableWidth, availableHeight);
-      const maxPartDimension = Math.max(partWidth, partHeight);
+      const maxPartDimension = Math.max(width, height);
       
-      let errorMessage = `Part dimensions (${partWidth} × ${partHeight} mm) are too large for the chipboard!\n`;
+      let errorMessage = `Part dimensions (${width} × ${height} mm) are too large for the chipboard!\n`;
       errorMessage += `Available space: ${availableWidth} × ${availableHeight} mm`;
       
       if (maxPartDimension > maxDimension) {
@@ -69,11 +67,8 @@ function PartsManager({
     
     const part: ProjectPart = {
       id: editingId || uuidv4(),
-      name: partName || `Part ${parts.length + 1}`,
-      dimensions: { width: partWidth, height: partHeight },
-      canRotate: partCanRotate,
-      count: partCount,
-      pvcEdges,
+      ...formData,
+      name: formData.name || `Part ${parts.length + 1}`,
     };
 
     if (editingId) {
@@ -87,31 +82,48 @@ function PartsManager({
   };
 
   const resetForm = () => {
-    setPartName('');
-    setPartWidth(100);
-    setPartHeight(100);
-    setPartCanRotate(true);
-    setPartCount(1);
-    setPvcEdges({ top: false, right: false, bottom: false, left: false });
+    setFormData({
+      name: '',
+      dimensions: { width: 100, height: 100 },
+      canRotate: true,
+      count: 1,
+      pvcEdges: { top: false, right: false, bottom: false, left: false },
+    });
     setShowAddForm(false);
     setValidationError(null);
   };
 
   const handleEdit = (part: ProjectPart) => {
-    setPartName(part.name);
-    setPartWidth(part.dimensions.width);
-    setPartHeight(part.dimensions.height);
-    setPartCanRotate(part.canRotate);
-    setPartCount(part.count);
-    setPvcEdges(part.pvcEdges || { top: false, right: false, bottom: false, left: false });
+    setFormData({
+      name: part.name,
+      dimensions: { ...part.dimensions },
+      canRotate: part.canRotate,
+      count: part.count,
+      pvcEdges: part.pvcEdges,
+    });
     setEditingId(part.id);
     setShowAddForm(true);
     setValidationError(null);
   };
 
-  const handleDimensionChange = (setter: (value: number) => void, value: number) => {
-    setter(value);
-    setValidationError(null); // Clear error when user changes dimensions
+  const updateFormData = (updates: Partial<PartFormData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
+    setValidationError(null);
+  };
+
+  const updateDimensions = (updates: Partial<{ width: number; height: number }>) => {
+    setFormData(prev => ({
+      ...prev,
+      dimensions: { ...prev.dimensions, ...updates }
+    }));
+    setValidationError(null);
+  };
+
+  const updatePvcEdges = (updates: Partial<{ top: boolean; right: boolean; bottom: boolean; left: boolean }>) => {
+    setFormData(prev => ({
+      ...prev,
+      pvcEdges: { ...prev.pvcEdges, ...updates }
+    }));
   };
 
   const totalParts = parts.reduce((sum, p) => sum + p.count, 0);
@@ -143,8 +155,8 @@ function PartsManager({
               </label>
               <input
                 type="text"
-                value={partName}
-                onChange={(e) => setPartName(e.target.value)}
+                value={formData.name}
+                onChange={(e) => updateFormData({ name: e.target.value })}
                 placeholder="e.g., Shelf, Door..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
@@ -157,8 +169,8 @@ function PartsManager({
                 </label>
                 <input
                   type="number"
-                  value={partWidth}
-                  onChange={(e) => handleDimensionChange(setPartWidth, Number(e.target.value))}
+                  value={formData.dimensions.width}
+                  onChange={(e) => updateDimensions({ width: Number(e.target.value) })}
                   min="1"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -170,8 +182,8 @@ function PartsManager({
                 </label>
                 <input
                   type="number"
-                  value={partHeight}
-                  onChange={(e) => handleDimensionChange(setPartHeight, Number(e.target.value))}
+                  value={formData.dimensions.height}
+                  onChange={(e) => updateDimensions({ height: Number(e.target.value) })}
                   min="1"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -185,8 +197,8 @@ function PartsManager({
               </label>
               <input
                 type="number"
-                value={partCount}
-                onChange={(e) => setPartCount(Number(e.target.value))}
+                value={formData.count}
+                onChange={(e) => updateFormData({ count: Number(e.target.value) })}
                 min="1"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -197,11 +209,8 @@ function PartsManager({
               <input
                 type="checkbox"
                 id="canRotate"
-                checked={partCanRotate}
-                onChange={(e) => {
-                  setPartCanRotate(e.target.checked);
-                  setValidationError(null); // Clear error when rotation setting changes
-                }}
+                checked={formData.canRotate}
+                onChange={(e) => updateFormData({ canRotate: e.target.checked })}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
               <label htmlFor="canRotate" className="ml-2 text-sm text-gray-700">
@@ -218,8 +227,8 @@ function PartsManager({
                   <input
                     type="checkbox"
                     id="pvc-top"
-                    checked={pvcEdges.top}
-                    onChange={(e) => setPvcEdges({ ...pvcEdges, top: e.target.checked })}
+                    checked={formData.pvcEdges.top}
+                    onChange={(e) => updatePvcEdges({ top: e.target.checked })}
                     className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                   />
                   <label htmlFor="pvc-top" className="ml-2 text-sm text-gray-700">
@@ -230,8 +239,8 @@ function PartsManager({
                   <input
                     type="checkbox"
                     id="pvc-right"
-                    checked={pvcEdges.right}
-                    onChange={(e) => setPvcEdges({ ...pvcEdges, right: e.target.checked })}
+                    checked={formData.pvcEdges.right}
+                    onChange={(e) => updatePvcEdges({ right: e.target.checked })}
                     className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                   />
                   <label htmlFor="pvc-right" className="ml-2 text-sm text-gray-700">
@@ -242,8 +251,8 @@ function PartsManager({
                   <input
                     type="checkbox"
                     id="pvc-bottom"
-                    checked={pvcEdges.bottom}
-                    onChange={(e) => setPvcEdges({ ...pvcEdges, bottom: e.target.checked })}
+                    checked={formData.pvcEdges.bottom}
+                    onChange={(e) => updatePvcEdges({ bottom: e.target.checked })}
                     className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                   />
                   <label htmlFor="pvc-bottom" className="ml-2 text-sm text-gray-700">
@@ -254,8 +263,8 @@ function PartsManager({
                   <input
                     type="checkbox"
                     id="pvc-left"
-                    checked={pvcEdges.left}
-                    onChange={(e) => setPvcEdges({ ...pvcEdges, left: e.target.checked })}
+                    checked={formData.pvcEdges.left}
+                    onChange={(e) => updatePvcEdges({ left: e.target.checked })}
                     className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                   />
                   <label htmlFor="pvc-left" className="ml-2 text-sm text-gray-700">

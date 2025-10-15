@@ -31,14 +31,17 @@ export interface PvcEdges {
   left: boolean;
 }
 
-export interface ProjectPart {
-  id: string;
-  templateId?: string;
+export interface PartFormData {
   name: string;
   dimensions: Dimensions;
   canRotate: boolean;
   count: number;
-  pvcEdges?: PvcEdges;
+  pvcEdges: PvcEdges;
+}
+
+export interface ProjectPart extends PartFormData {
+  id: string;
+  templateId?: string;
 }
 
 export interface PlacedPart {

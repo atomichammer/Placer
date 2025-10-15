@@ -21,7 +21,7 @@ export function exportProjectToCSV(project: Project): string {
 
   // Parts section
   lines.push('# PARTS');
-  lines.push('ID,Name,Width,Height,CanRotate,Count');
+  lines.push('ID,Name,Width,Height,CanRotate,Count,PvcTop,PvcRight,PvcBottom,PvcLeft');
   
   for (const part of project.parts) {
     lines.push([
@@ -31,6 +31,10 @@ export function exportProjectToCSV(project: Project): string {
       part.dimensions.height,
       part.canRotate ? 'true' : 'false',
       part.count,
+      part.pvcEdges.top ? 'true' : 'false',
+      part.pvcEdges.right ? 'true' : 'false',
+      part.pvcEdges.bottom ? 'true' : 'false',
+      part.pvcEdges.left ? 'true' : 'false',
     ].join(','));
   }
 
@@ -91,6 +95,12 @@ export function importProjectFromCSV(csvContent: string, projectId: string): Pro
         },
         canRotate: values[4] === 'true',
         count: parseInt(values[5], 10),
+        pvcEdges: {
+          top: values[6] === 'true',
+          right: values[7] === 'true',
+          bottom: values[8] === 'true',
+          left: values[9] === 'true',
+        },
       };
       parts.push(part);
     }
