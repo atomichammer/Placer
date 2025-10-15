@@ -100,30 +100,7 @@ export async function exportToPDF(
   projectName: string,
   _sawThickness: number
 ) {
-  // Start with landscape orientation for chipboards
-  const pdf = new jsPDF('l', 'mm', 'a4');
-
-  // Draw each chipboard on its own page
-  result.chipboards.forEach((chipboardData, index) => {
-    if (index > 0) {
-      pdf.addPage('l');
-    }
-    drawChipboardLayout(pdf, chipboardData, index + 1, projectName);
-  });
-
-  // Parts list for stickers (portrait orientation)
-  pdf.addPage('p');
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 10;
-
-  pdf.setFontSize(12);
-  pdf.text(`${projectName} - Parts Stickers`, margin, margin + 5);
-
-  pdf.setFontSize(8);
-  pdf.text('Cut along grid lines', margin, margin + 10);
-
-  // Create sticker-like layout for parts
+  // Calculate total pages
   const allParts: Array<{ name: string; id: string; dimensions: { width: number; height: number }; chipboard: number }> = [];
   
   result.chipboards.forEach((chipboard, chipboardIndex) => {
@@ -136,6 +113,49 @@ export async function exportToPDF(
       });
     });
   });
+  
+  const stickersPerPage = 24; // 3x8 grid
+  const stickerPages = Math.ceil(allParts.length / stickersPerPage);
+  const totalPages = result.chipboards.length + stickerPages;
+
+  // Start with landscape orientation for chipboards
+  const pdf = new jsPDF('l', 'mm', 'a4');
+  let currentPage = 1;
+
+  // Draw each chipboard on its own page
+  result.chipboards.forEach((chipboardData, index) => {
+    if (index > 0) {
+      pdf.addPage('l');
+      currentPage++;
+    }
+    drawChipboardLayout(pdf, chipboardData, index + 1, projectName);
+    
+    // Add page number
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    pdf.setFontSize(8);
+    pdf.setTextColor(100);
+    pdf.text(`Page ${currentPage} of ${totalPages}`, pageWidth - 35, 10, { align: 'right' });
+    pdf.setTextColor(0);
+  });
+
+  // Parts list for stickers (portrait orientation)
+  pdf.addPage('p');
+  currentPage++;
+  
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 10;
+
+  pdf.setFontSize(12);
+  pdf.text(`${projectName} - Parts Stickers`, margin, margin + 5);
+
+  pdf.setFontSize(8);
+  pdf.text('Cut along grid lines', margin, margin + 10);
+  
+  // Add page number
+  pdf.setTextColor(100);
+  pdf.text(`Page ${currentPage} of ${totalPages}`, pageWidth - 35, margin + 5, { align: 'right' });
+  pdf.setTextColor(0);
 
   // Sort by name for easier finding
   allParts.sort((a, b) => a.name.localeCompare(b.name));
@@ -143,7 +163,6 @@ export async function exportToPDF(
   // Grid layout parameters
   const cols = 3;
   const rows = 8;
-  const stickersPerPage = cols * rows;
   const stickerWidth = (pageWidth - 2 * margin) / cols;
   const stickerHeight = (pageHeight - 2 * margin - 15) / rows; // 15mm for header
   const gridStartY = margin + 15;
@@ -153,8 +172,16 @@ export async function exportToPDF(
   while (partIndex < allParts.length) {
     if (partIndex > 0 && partIndex % stickersPerPage === 0) {
       pdf.addPage('p');
+      currentPage++;
+      
       pdf.setFontSize(12);
       pdf.text(`${projectName} - Parts Stickers (cont.)`, margin, margin + 5);
+      
+      // Add page number
+      pdf.setFontSize(8);
+      pdf.setTextColor(100);
+      pdf.text(`Page ${currentPage} of ${totalPages}`, pageWidth - 35, margin + 5, { align: 'right' });
+      pdf.setTextColor(0);
     }
 
     const localIndex = partIndex % stickersPerPage;
