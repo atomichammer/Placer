@@ -81,6 +81,10 @@ function packChipboard(
   const placedParts: PlacedPart[] = [];
   const remainingParts: PartInstance[] = [];
   
+  // Track existing cut positions for alignment
+  const horizontalCuts = new Set<number>([chipboard.margin]);
+  const verticalCuts = new Set<number>([chipboard.margin]);
+  
   // Free rectangles using guillotine algorithm
   const freeRectangles: Rectangle[] = [
     {
@@ -92,7 +96,13 @@ function packChipboard(
   ];
 
   for (const part of parts) {
-    const placement = findBestPlacement(part, freeRectangles, sawThickness);
+    const placement = findBestPlacement(
+      part, 
+      freeRectangles, 
+      sawThickness,
+      horizontalCuts,
+      verticalCuts
+    );
     
     if (placement) {
       placedParts.push({
@@ -104,6 +114,12 @@ function packChipboard(
         y: placement.y,
         rotated: placement.rotated,
       });
+
+      // Add new cut positions
+      horizontalCuts.add(placement.y);
+      horizontalCuts.add(placement.y + placement.dimensions.height);
+      verticalCuts.add(placement.x);
+      verticalCuts.add(placement.x + placement.dimensions.width);
 
       // Split the used rectangle
       splitRectangle(freeRectangles, placement.rect, placement, sawThickness);
@@ -127,7 +143,9 @@ function packChipboard(
 function findBestPlacement(
   part: PartInstance,
   freeRectangles: Rectangle[],
-  _sawThickness: number
+  _sawThickness: number,
+  horizontalCuts: Set<number>,
+  verticalCuts: Set<number>
 ): {
   x: number;
   y: number;
@@ -144,17 +162,36 @@ function findBestPlacement(
     score: number;
   } | null = null;
 
+  const horizontalCutArray = Array.from(horizontalCuts).sort((a, b) => a - b);
+  const verticalCutArray = Array.from(verticalCuts).sort((a, b) => a - b);
+
   for (const rect of freeRectangles) {
     // Try normal orientation
     if (
       part.dimensions.width <= rect.width &&
       part.dimensions.height <= rect.height
     ) {
-      const score = rect.width * rect.height; // Prefer smaller rectangles
+      // Find aligned position within this rectangle
+      const alignedPos = findAlignedPosition(
+        rect,
+        part.dimensions.width,
+        part.dimensions.height,
+        horizontalCutArray,
+        verticalCutArray
+      );
+      
+      const x = alignedPos.x;
+      const y = alignedPos.y;
+      
+      // Score: prefer smaller rectangles and aligned positions
+      const areaScore = rect.width * rect.height;
+      const alignmentBonus = (alignedPos.alignmentScore * 1000);
+      const score = areaScore - alignmentBonus;
+      
       if (!bestPlacement || score < bestPlacement.score) {
         bestPlacement = {
-          x: rect.x,
-          y: rect.y,
+          x,
+          y,
           dimensions: { ...part.dimensions },
           rotated: false,
           rect,
@@ -169,11 +206,26 @@ function findBestPlacement(
       part.dimensions.height <= rect.width &&
       part.dimensions.width <= rect.height
     ) {
-      const score = rect.width * rect.height;
+      // Find aligned position within this rectangle
+      const alignedPos = findAlignedPosition(
+        rect,
+        part.dimensions.height,
+        part.dimensions.width,
+        horizontalCutArray,
+        verticalCutArray
+      );
+      
+      const x = alignedPos.x;
+      const y = alignedPos.y;
+      
+      const areaScore = rect.width * rect.height;
+      const alignmentBonus = (alignedPos.alignmentScore * 1000);
+      const score = areaScore - alignmentBonus;
+      
       if (!bestPlacement || score < bestPlacement.score) {
         bestPlacement = {
-          x: rect.x,
-          y: rect.y,
+          x,
+          y,
           dimensions: {
             width: part.dimensions.height,
             height: part.dimensions.width,
@@ -187,6 +239,38 @@ function findBestPlacement(
   }
 
   return bestPlacement;
+}
+
+function findAlignedPosition(
+  rect: Rectangle,
+  partWidth: number,
+  partHeight: number,
+  horizontalCuts: number[],
+  verticalCuts: number[]
+): { x: number; y: number; alignmentScore: number } {
+  let bestX = rect.x;
+  let bestY = rect.y;
+  let alignmentScore = 0;
+
+  // Try to align X position to existing vertical cuts
+  for (const cutX of verticalCuts) {
+    if (cutX >= rect.x && cutX + partWidth <= rect.x + rect.width) {
+      bestX = cutX;
+      alignmentScore += 1;
+      break;
+    }
+  }
+
+  // Try to align Y position to existing horizontal cuts
+  for (const cutY of horizontalCuts) {
+    if (cutY >= rect.y && cutY + partHeight <= rect.y + rect.height) {
+      bestY = cutY;
+      alignmentScore += 1;
+      break;
+    }
+  }
+
+  return { x: bestX, y: bestY, alignmentScore };
 }
 
 function splitRectangle(
