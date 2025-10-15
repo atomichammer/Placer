@@ -56,21 +56,21 @@ function getDefaultChipboards(): Chipboard[] {
       name: 'Standard Sheet 2440x1220mm',
       dimensions: { width: 2440, height: 1220 },
       thickness: 18,
-      margin: 0,
+      margin: 20,
     },
     {
       id: '2',
       name: 'Standard Sheet 2800x2070mm',
       dimensions: { width: 2800, height: 2070 },
       thickness: 18,
-      margin: 0,
+      margin: 20,
     },
     {
       id: '3',
       name: 'Small Sheet 1220x610mm',
       dimensions: { width: 1220, height: 610 },
       thickness: 18,
-      margin: 0,
+      margin: 20,
     },
   ];
 }

@@ -4,12 +4,14 @@ import { Project, Chipboard, ProjectPart } from './types';
 import ProjectSetup from './components/ProjectSetup';
 import PartsManager from './components/PartsManager';
 import PlacementView from './components/PlacementView';
+import ProjectSettings from './components/ProjectSettings';
 import { optimizePlacement } from './utils/placement';
 import { exportProjectToCSV, importProjectFromCSV, downloadCSV } from './utils/projectIO';
 
 function App() {
   const [project, setProject] = useState<Project | null>(null);
   const [showSetup, setShowSetup] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreateProject = (
@@ -110,6 +112,20 @@ function App() {
     reader.readAsText(file);
   };
 
+  const handleUpdateSettings = (sawThickness: number, margin: number) => {
+    if (!project) return;
+
+    setProject({
+      ...project,
+      sawThickness,
+      chipboard: {
+        ...project.chipboard,
+        margin,
+      },
+      placementResult: undefined, // Clear placement when settings change
+    });
+  };
+
   if (!project || showSetup) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
@@ -138,7 +154,7 @@ function App() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Chipboard: {project.chipboard.name} | Saw thickness: {project.sawThickness}mm
+                Chipboard: {project.chipboard.name} | Saw: {project.sawThickness}mm | Margin: {project.chipboard.margin}mm
               </p>
             </div>
             <div className="flex gap-2">
@@ -161,6 +177,17 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 Load
+              </button>
+              <button
+                onClick={() => setShowSettings(true)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                title="Project settings"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Settings
               </button>
               <button
                 onClick={handleNewProject}
@@ -224,6 +251,15 @@ function App() {
         onChange={handleFileSelected}
         style={{ display: 'none' }}
       />
+
+      {/* Project settings modal */}
+      {showSettings && (
+        <ProjectSettings
+          project={project}
+          onUpdate={handleUpdateSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </div>
   );
 }

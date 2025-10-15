@@ -20,7 +20,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
   const [newChipboardWidth, setNewChipboardWidth] = useState(2440);
   const [newChipboardHeight, setNewChipboardHeight] = useState(1220);
   const [newChipboardThickness, setNewChipboardThickness] = useState(18);
-  const [newChipboardMargin, setNewChipboardMargin] = useState(0);
+  const [newChipboardMargin, setNewChipboardMargin] = useState(20);
 
   const handleCreateChipboard = () => {
     const newChipboard: Chipboard = {
@@ -44,7 +44,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
     setNewChipboardWidth(2440);
     setNewChipboardHeight(1220);
     setNewChipboardThickness(18);
-    setNewChipboardMargin(0);
+    setNewChipboardMargin(20);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
