@@ -1,31 +1,52 @@
 import { useState } from 'react';
-import { PlacementResult } from '../types';
+import { PlacementResult, PlacedPart } from '../types';
 import ChipboardVisualization from './ChipboardVisualization';
 import Statistics from './Statistics';
 
 interface PlacementViewProps {
   result: PlacementResult;
+  onResultUpdate?: (result: PlacementResult) => void;
 }
 
-function PlacementView({ result }: PlacementViewProps) {
+function PlacementView({ result, onResultUpdate }: PlacementViewProps) {
   const [selectedChipboardIndex, setSelectedChipboardIndex] = useState(0);
+  const [localResult, setLocalResult] = useState(result);
+
+  const handlePartsUpdate = (chipboardIndex: number, updatedParts: PlacedPart[]) => {
+    const newChipboards = [...localResult.chipboards];
+    newChipboards[chipboardIndex] = {
+      ...newChipboards[chipboardIndex],
+      parts: updatedParts,
+    };
+
+    const newResult = {
+      ...localResult,
+      chipboards: newChipboards,
+    };
+
+    setLocalResult(newResult);
+    
+    if (onResultUpdate) {
+      onResultUpdate(newResult);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <Statistics statistics={result.statistics} />
+      <Statistics statistics={localResult.statistics} />
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="p-4 bg-gradient-to-r from-purple-600 to-purple-700">
           <h2 className="text-2xl font-bold text-white">Placement Results</h2>
           <p className="text-purple-100 mt-1">
-            {result.chipboards.length} chipboard{result.chipboards.length !== 1 ? 's' : ''} used
+            {localResult.chipboards.length} chipboard{localResult.chipboards.length !== 1 ? 's' : ''} used • Interactive: drag to move, click to select
           </p>
         </div>
 
-        {result.chipboards.length > 1 && (
+        {localResult.chipboards.length > 1 && (
           <div className="p-4 border-b bg-gray-50">
             <div className="flex gap-2 flex-wrap">
-              {result.chipboards.map((_, index) => (
+              {localResult.chipboards.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedChipboardIndex(index)}
@@ -44,8 +65,9 @@ function PlacementView({ result }: PlacementViewProps) {
 
         <div className="p-6">
           <ChipboardVisualization
-            chipboardWithParts={result.chipboards[selectedChipboardIndex]}
+            chipboardWithParts={localResult.chipboards[selectedChipboardIndex]}
             chipboardNumber={selectedChipboardIndex + 1}
+            onPartsUpdate={(parts) => handlePartsUpdate(selectedChipboardIndex, parts)}
           />
         </div>
       </div>

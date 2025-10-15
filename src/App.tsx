@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Project, Chipboard, ProjectPart } from './types';
+import { Project, Chipboard, ProjectPart, PlacementResult } from './types';
 import ProjectSetup from './components/ProjectSetup';
 import PartsManager from './components/PartsManager';
 import PlacementView from './components/PlacementView';
@@ -126,6 +126,15 @@ function App() {
     });
   };
 
+  const handlePlacementUpdate = (updatedResult: PlacementResult) => {
+    if (!project) return;
+    
+    setProject({
+      ...project,
+      placementResult: updatedResult,
+    });
+  };
+
   if (!project || showSetup) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
@@ -217,7 +226,10 @@ function App() {
           
           <div className="lg:col-span-2">
             {project.placementResult ? (
-              <PlacementView result={project.placementResult} />
+              <PlacementView 
+                result={project.placementResult}
+                onResultUpdate={handlePlacementUpdate}
+              />
             ) : (
               <div className="bg-white rounded-lg shadow-md p-8 text-center">
                 <svg
