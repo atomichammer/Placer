@@ -85,11 +85,11 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
 
   const snapToNearestIntersection = (x: number, y: number, partWidth: number, partHeight: number) => {
     const intersections = getCutLineIntersections();
-    const snapThreshold = 100; // mm in world coordinates (increased for better snapping)
 
     let bestSnap = { x, y };
     let bestDistance = Infinity;
 
+    // Find the nearest valid intersection
     for (const intersection of intersections) {
       // Check if part would fit at this intersection
       const fitsHorizontally = intersection.x >= chipboard.margin && 
@@ -102,13 +102,15 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
           Math.pow(intersection.x - x, 2) + Math.pow(intersection.y - y, 2)
         );
 
-        if (distance < snapThreshold && distance < bestDistance) {
+        // Always snap to the nearest valid intersection
+        if (distance < bestDistance) {
           bestDistance = distance;
           bestSnap = intersection;
         }
       }
     }
 
+    console.log('Snap from:', { x, y }, 'to:', bestSnap, 'distance:', bestDistance);
     return bestSnap;
   };
 
@@ -362,12 +364,19 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
   };
 
   const handleSnapToGrid = () => {
-    if (!selectedPartId) return;
+    if (!selectedPartId) {
+      console.log('No part selected');
+      return;
+    }
 
     const partIndex = localParts.findIndex(p => p.id === selectedPartId);
-    if (partIndex === -1) return;
+    if (partIndex === -1) {
+      console.log('Part not found in localParts');
+      return;
+    }
 
     const part = localParts[partIndex];
+    console.log('Current part position:', part.x, part.y);
     
     // Snap to nearest intersection
     const snapped = snapToNearestIntersection(
@@ -377,6 +386,14 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
       part.dimensions.height
     );
 
+    console.log('Snapped position:', snapped.x, snapped.y);
+
+    // Check if position actually changed
+    if (snapped.x === part.x && snapped.y === part.y) {
+      console.log('Part is already at an intersection');
+      return;
+    }
+
     const newParts = [...localParts];
     newParts[partIndex] = {
       ...part,
@@ -384,6 +401,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
       y: snapped.y,
     };
 
+    console.log('Updating parts...');
     setLocalParts(newParts);
     
     // Notify parent of update
