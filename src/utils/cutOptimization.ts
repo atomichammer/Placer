@@ -5,68 +5,95 @@ export function recalculateCutLines(
   chipboard: Chipboard,
   _sawThickness: number
 ): CutLine[] {
-  const horizontalCuts = new Map<number, { start: number; end: number }[]>();
-  const verticalCuts = new Map<number, { start: number; end: number }[]>();
-
-  // Collect all cut positions and their ranges
-  for (const part of parts) {
-    // Vertical cuts (constant X position)
-    const leftX = part.x;
-    const rightX = part.x + part.dimensions.width;
-
-    // Horizontal cuts (constant Y position)
-    const bottomY = part.y;
-    const topY = part.y + part.dimensions.height;
-
-    // Add vertical cuts with their Y ranges
-    addCutSegment(verticalCuts, leftX, part.y, part.y + part.dimensions.height);
-    addCutSegment(verticalCuts, rightX, part.y, part.y + part.dimensions.height);
-
-    // Add horizontal cuts with their X ranges
-    addCutSegment(horizontalCuts, bottomY, part.x, part.x + part.dimensions.width);
-    addCutSegment(horizontalCuts, topY, part.x, part.x + part.dimensions.width);
-  }
+  if (parts.length === 0) return [];
 
   const cutLines: CutLine[] = [];
+  const minX = chipboard.margin;
+  const maxX = chipboard.dimensions.width - chipboard.margin;
+  const minY = chipboard.margin;
+  const maxY = chipboard.dimensions.height - chipboard.margin;
 
-  // Process vertical cuts (merge overlapping segments)
-  for (const [x, segments] of verticalCuts) {
-    if (x < chipboard.margin || x > chipboard.dimensions.width - chipboard.margin) continue;
-    
-    const merged = mergeSegments(segments);
-    for (const segment of merged) {
-      const y1 = Math.max(segment.start, chipboard.margin);
-      const y2 = Math.min(segment.end, chipboard.dimensions.height - chipboard.margin);
-      
-      if (y2 > y1) {
+  // Collect all unique X and Y positions (edges of parts)
+  const xPositions = new Set<number>([minX, maxX]);
+  const yPositions = new Set<number>([minY, maxY]);
+
+  for (const part of parts) {
+    xPositions.add(part.x);
+    xPositions.add(part.x + part.dimensions.width);
+    yPositions.add(part.y);
+    yPositions.add(part.y + part.dimensions.height);
+  }
+
+  const sortedX = Array.from(xPositions).sort((a, b) => a - b);
+  const sortedY = Array.from(yPositions).sort((a, b) => a - b);
+
+  // Determine which direction to cut first (more divisions = primary direction)
+  const useVerticalFirst = sortedX.length >= sortedY.length;
+
+  if (useVerticalFirst) {
+    // First: Vertical cuts across entire height
+    for (let i = 1; i < sortedX.length - 1; i++) {
+      const x = sortedX[i];
+      if (isVerticalCutNeeded(x, parts, minY, maxY)) {
         cutLines.push({
           x1: x,
-          y1,
+          y1: minY,
           x2: x,
-          y2,
-          length: y2 - y1,
+          y2: maxY,
+          length: maxY - minY,
         });
       }
     }
-  }
 
-  // Process horizontal cuts (merge overlapping segments)
-  for (const [y, segments] of horizontalCuts) {
-    if (y < chipboard.margin || y > chipboard.dimensions.height - chipboard.margin) continue;
-    
-    const merged = mergeSegments(segments);
-    for (const segment of merged) {
-      const x1 = Math.max(segment.start, chipboard.margin);
-      const x2 = Math.min(segment.end, chipboard.dimensions.width - chipboard.margin);
+    // Second: Horizontal cuts within vertical strips
+    for (let i = 0; i < sortedX.length - 1; i++) {
+      const xStart = sortedX[i];
+      const xEnd = sortedX[i + 1];
       
-      if (x2 > x1) {
+      for (let j = 1; j < sortedY.length - 1; j++) {
+        const y = sortedY[j];
+        if (isHorizontalCutNeeded(y, parts, xStart, xEnd)) {
+          cutLines.push({
+            x1: xStart,
+            y1: y,
+            x2: xEnd,
+            y2: y,
+            length: xEnd - xStart,
+          });
+        }
+      }
+    }
+  } else {
+    // First: Horizontal cuts across entire width
+    for (let i = 1; i < sortedY.length - 1; i++) {
+      const y = sortedY[i];
+      if (isHorizontalCutNeeded(y, parts, minX, maxX)) {
         cutLines.push({
-          x1,
+          x1: minX,
           y1: y,
-          x2,
+          x2: maxX,
           y2: y,
-          length: x2 - x1,
+          length: maxX - minX,
         });
+      }
+    }
+
+    // Second: Vertical cuts within horizontal strips
+    for (let i = 0; i < sortedY.length - 1; i++) {
+      const yStart = sortedY[i];
+      const yEnd = sortedY[i + 1];
+      
+      for (let j = 1; j < sortedX.length - 1; j++) {
+        const x = sortedX[j];
+        if (isVerticalCutNeeded(x, parts, yStart, yEnd)) {
+          cutLines.push({
+            x1: x,
+            y1: yStart,
+            x2: x,
+            y2: yEnd,
+            length: yEnd - yStart,
+          });
+        }
       }
     }
   }
@@ -74,38 +101,56 @@ export function recalculateCutLines(
   return cutLines;
 }
 
-function addCutSegment(
-  cuts: Map<number, { start: number; end: number }[]>,
-  position: number,
-  start: number,
-  end: number
-): void {
-  if (!cuts.has(position)) {
-    cuts.set(position, []);
+// Check if a vertical cut at position x is needed between yStart and yEnd
+function isVerticalCutNeeded(x: number, parts: PlacedPart[], yStart: number, yEnd: number): boolean {
+  // A vertical cut is needed if there are parts on different sides of this line
+  let hasLeft = false;
+  let hasRight = false;
+
+  for (const part of parts) {
+    const partTop = part.y + part.dimensions.height;
+    const partRight = part.x + part.dimensions.width;
+
+    // Check if part overlaps with the Y range
+    if (part.y < yEnd && partTop > yStart) {
+      if (partRight <= x) {
+        hasLeft = true;
+      }
+      if (part.x >= x) {
+        hasRight = true;
+      }
+    }
+
+    if (hasLeft && hasRight) return true;
   }
-  cuts.get(position)!.push({ start, end });
+
+  return false;
 }
 
-function mergeSegments(segments: { start: number; end: number }[]): { start: number; end: number }[] {
-  if (segments.length === 0) return [];
+// Check if a horizontal cut at position y is needed between xStart and xEnd
+function isHorizontalCutNeeded(y: number, parts: PlacedPart[], xStart: number, xEnd: number): boolean {
+  // A horizontal cut is needed if there are parts on different sides of this line
+  let hasBottom = false;
+  let hasTop = false;
 
-  // Sort by start position
-  const sorted = segments.sort((a, b) => a.start - b.start);
-  const merged: { start: number; end: number }[] = [sorted[0]];
+  for (const part of parts) {
+    const partTop = part.y + part.dimensions.height;
+    const partRight = part.x + part.dimensions.width;
 
-  for (let i = 1; i < sorted.length; i++) {
-    const current = sorted[i];
-    const last = merged[merged.length - 1];
-
-    // If segments overlap or are adjacent, merge them
-    if (current.start <= last.end) {
-      last.end = Math.max(last.end, current.end);
-    } else {
-      merged.push(current);
+    // Check if part overlaps with the X range
+    if (part.x < xEnd && partRight > xStart) {
+      if (partTop <= y) {
+        hasBottom = true;
+      }
+      if (part.y >= y) {
+        hasTop = true;
+      }
     }
+
+    if (hasBottom && hasTop) return true;
   }
 
-  return merged;
+  return false;
 }
 
 export function recalculateStatistics(
