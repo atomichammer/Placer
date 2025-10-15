@@ -161,6 +161,7 @@ export function recalculateStatistics(
   let totalCutLength = 0;
   let totalCutOperations = 0;
   let totalUsedArea = 0;
+  let totalPvcLength = 0;
 
   for (const board of chipboards) {
     totalCutOperations += board.cutLines.length;
@@ -168,6 +169,14 @@ export function recalculateStatistics(
     
     for (const part of board.parts) {
       totalUsedArea += part.dimensions.width * part.dimensions.height;
+      
+      // Calculate PVC edge length for this part
+      if (part.pvcEdges) {
+        if (part.pvcEdges.top) totalPvcLength += part.dimensions.width;
+        if (part.pvcEdges.bottom) totalPvcLength += part.dimensions.width;
+        if (part.pvcEdges.left) totalPvcLength += part.dimensions.height;
+        if (part.pvcEdges.right) totalPvcLength += part.dimensions.height;
+      }
     }
   }
 
@@ -186,6 +195,7 @@ export function recalculateStatistics(
     totalCutLength: Math.round(totalCutLength),
     totalCutOperations,
     efficiency: Math.round(efficiency * 100) / 100,
+    totalPvcLength: Math.round(totalPvcLength),
   };
 }
 

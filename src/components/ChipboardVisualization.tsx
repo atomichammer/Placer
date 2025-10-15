@@ -273,6 +273,38 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
         ctx.fillText('↻', x + 10, y + 15);
       }
 
+      // PVC edge indicators (green lines)
+      if (part.pvcEdges) {
+        ctx.strokeStyle = '#10b981'; // green-500
+        ctx.lineWidth = 4;
+        ctx.setLineDash([]);
+
+        if (part.pvcEdges.top) {
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + width, y);
+          ctx.stroke();
+        }
+        if (part.pvcEdges.right) {
+          ctx.beginPath();
+          ctx.moveTo(x + width, y);
+          ctx.lineTo(x + width, y + height);
+          ctx.stroke();
+        }
+        if (part.pvcEdges.bottom) {
+          ctx.beginPath();
+          ctx.moveTo(x, y + height);
+          ctx.lineTo(x + width, y + height);
+          ctx.stroke();
+        }
+        if (part.pvcEdges.left) {
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x, y + height);
+          ctx.stroke();
+        }
+      }
+
       // Drag cursor indicator
       if (isDragging) {
         ctx.strokeStyle = '#3b82f6';
@@ -540,6 +572,9 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
           </span>
           <span className="flex items-center gap-1">
             <span className="w-4 h-0.5 bg-red-300"></span> Actual cuts ({chipboardWithParts.cutLines.length})
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-1 bg-green-500"></span> PVC edges
           </span>
         </div>
       </div>

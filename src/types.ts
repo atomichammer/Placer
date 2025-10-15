@@ -24,6 +24,13 @@ export interface PartGroup {
   parts: PartTemplate[];
 }
 
+export interface PvcEdges {
+  top: boolean;
+  right: boolean;
+  bottom: boolean;
+  left: boolean;
+}
+
 export interface ProjectPart {
   id: string;
   templateId?: string;
@@ -31,6 +38,7 @@ export interface ProjectPart {
   dimensions: Dimensions;
   canRotate: boolean;
   count: number;
+  pvcEdges?: PvcEdges;
 }
 
 export interface PlacedPart {
@@ -41,6 +49,7 @@ export interface PlacedPart {
   x: number;
   y: number;
   rotated: boolean;
+  pvcEdges?: PvcEdges;
 }
 
 export interface ChipboardWithParts {
@@ -68,6 +77,7 @@ export interface PlacementStatistics {
   totalCutLength: number;
   totalCutOperations: number;
   efficiency: number; // Percentage of material used
+  totalPvcLength: number; // Total PVC edge banding required in mm
 }
 
 export interface Project {

@@ -7,6 +7,7 @@ import {
   PlacementResult,
   CutLine,
   Dimensions,
+  PvcEdges,
 } from '../types';
 
 interface Rectangle {
@@ -22,6 +23,7 @@ interface PartInstance {
   name: string;
   dimensions: Dimensions;
   canRotate: boolean;
+  pvcEdges?: PvcEdges;
 }
 
 export function optimizePlacement(
@@ -39,6 +41,7 @@ export function optimizePlacement(
         name: part.name || `Part ${part.id}`,
         dimensions: { ...part.dimensions },
         canRotate: part.canRotate,
+        pvcEdges: part.pvcEdges,
       });
     }
   }
@@ -105,6 +108,18 @@ function packChipboard(
     );
     
     if (placement) {
+      // Rotate PVC edges if part was rotated
+      let rotatedPvcEdges = part.pvcEdges;
+      if (placement.rotated && part.pvcEdges) {
+        // When rotating 90° clockwise: top→right, right→bottom, bottom→left, left→top
+        rotatedPvcEdges = {
+          top: part.pvcEdges.left,
+          right: part.pvcEdges.top,
+          bottom: part.pvcEdges.right,
+          left: part.pvcEdges.bottom,
+        };
+      }
+      
       placedParts.push({
         id: part.id,
         partId: part.partId,
@@ -113,6 +128,7 @@ function packChipboard(
         x: placement.x,
         y: placement.y,
         rotated: placement.rotated,
+        pvcEdges: rotatedPvcEdges,
       });
 
       // Add new cut positions
@@ -386,10 +402,12 @@ function calculateStatistics(
   totalCutLength: number;
   totalCutOperations: number;
   efficiency: number;
+  totalPvcLength: number;
 } {
   let totalCutLength = 0;
   let totalCutOperations = 0;
   let totalUsedArea = 0;
+  let totalPvcLength = 0;
 
   for (const board of chipboards) {
     totalCutOperations += board.cutLines.length;
@@ -397,6 +415,14 @@ function calculateStatistics(
     
     for (const part of board.parts) {
       totalUsedArea += part.dimensions.width * part.dimensions.height;
+      
+      // Calculate PVC edge length for this part
+      if (part.pvcEdges) {
+        if (part.pvcEdges.top) totalPvcLength += part.dimensions.width;
+        if (part.pvcEdges.bottom) totalPvcLength += part.dimensions.width;
+        if (part.pvcEdges.left) totalPvcLength += part.dimensions.height;
+        if (part.pvcEdges.right) totalPvcLength += part.dimensions.height;
+      }
     }
   }
 
@@ -415,6 +441,7 @@ function calculateStatistics(
     totalCutLength: Math.round(totalCutLength),
     totalCutOperations,
     efficiency: Math.round(efficiency * 100) / 100,
+    totalPvcLength: Math.round(totalPvcLength),
   };
 }
 

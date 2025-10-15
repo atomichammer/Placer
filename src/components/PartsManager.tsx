@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ProjectPart, Chipboard } from '../types';
+import { ProjectPart, Chipboard, PvcEdges } from '../types';
 
 interface PartsManagerProps {
   parts: ProjectPart[];
@@ -30,6 +30,12 @@ function PartsManager({
   const [partHeight, setPartHeight] = useState(100);
   const [partCanRotate, setPartCanRotate] = useState(true);
   const [partCount, setPartCount] = useState(1);
+  const [pvcEdges, setPvcEdges] = useState<PvcEdges>({
+    top: false,
+    right: false,
+    bottom: false,
+    left: false,
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +73,7 @@ function PartsManager({
       dimensions: { width: partWidth, height: partHeight },
       canRotate: partCanRotate,
       count: partCount,
+      pvcEdges,
     };
 
     if (editingId) {
@@ -85,6 +92,7 @@ function PartsManager({
     setPartHeight(100);
     setPartCanRotate(true);
     setPartCount(1);
+    setPvcEdges({ top: false, right: false, bottom: false, left: false });
     setShowAddForm(false);
     setValidationError(null);
   };
@@ -95,6 +103,7 @@ function PartsManager({
     setPartHeight(part.dimensions.height);
     setPartCanRotate(part.canRotate);
     setPartCount(part.count);
+    setPvcEdges(part.pvcEdges || { top: false, right: false, bottom: false, left: false });
     setEditingId(part.id);
     setShowAddForm(true);
     setValidationError(null);
@@ -198,6 +207,62 @@ function PartsManager({
               <label htmlFor="canRotate" className="ml-2 text-sm text-gray-700">
                 Allow rotation
               </label>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">
+                PVC Edge Banding
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="pvc-top"
+                    checked={pvcEdges.top}
+                    onChange={(e) => setPvcEdges({ ...pvcEdges, top: e.target.checked })}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="pvc-top" className="ml-2 text-sm text-gray-700">
+                    Top
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="pvc-right"
+                    checked={pvcEdges.right}
+                    onChange={(e) => setPvcEdges({ ...pvcEdges, right: e.target.checked })}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="pvc-right" className="ml-2 text-sm text-gray-700">
+                    Right
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="pvc-bottom"
+                    checked={pvcEdges.bottom}
+                    onChange={(e) => setPvcEdges({ ...pvcEdges, bottom: e.target.checked })}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="pvc-bottom" className="ml-2 text-sm text-gray-700">
+                    Bottom
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="pvc-left"
+                    checked={pvcEdges.left}
+                    onChange={(e) => setPvcEdges({ ...pvcEdges, left: e.target.checked })}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="pvc-left" className="ml-2 text-sm text-gray-700">
+                    Left
+                  </label>
+                </div>
+              </div>
             </div>
 
             {validationError && (

@@ -57,6 +57,16 @@ function Statistics({ statistics, onRecalculate }: StatisticsProps) {
       ),
       color: 'bg-teal-500',
     },
+    {
+      label: 'PVC Edge Length',
+      value: `${statistics.totalPvcLength.toLocaleString()} mm`,
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+      ),
+      color: 'bg-pink-500',
+    },
   ];
 
   return (
@@ -76,7 +86,7 @@ function Statistics({ statistics, onRecalculate }: StatisticsProps) {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-6">
         {stats.map((stat, index) => (
           <div key={index} className="text-center">
             <div className={`${stat.color} w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 text-white`}>
