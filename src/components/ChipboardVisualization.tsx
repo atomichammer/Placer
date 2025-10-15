@@ -341,34 +341,45 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
   const handleMouseUp = () => {
     if (!dragState) return;
 
-    const partIndex = localParts.findIndex(p => p.id === dragState.partId);
-    if (partIndex !== -1) {
-      const part = localParts[partIndex];
-      
-      // Snap to nearest intersection
-      const snapped = snapToNearestIntersection(
-        part.x,
-        part.y,
-        part.dimensions.width,
-        part.dimensions.height
-      );
-
-      const newParts = [...localParts];
-      newParts[partIndex] = {
-        ...part,
-        x: snapped.x,
-        y: snapped.y,
-      };
-
-      setLocalParts(newParts);
-      
-      // Notify parent of update
-      if (onPartsUpdate) {
-        onPartsUpdate(newParts);
-      }
+    // Just stop dragging, don't snap automatically
+    // User can use the "Snap to Grid" button if they want
+    if (onPartsUpdate) {
+      onPartsUpdate(localParts);
     }
 
     setDragState(null);
+    // Keep the part selected so user can snap it
+  };
+
+  const handleSnapToGrid = () => {
+    if (!selectedPartId) return;
+
+    const partIndex = localParts.findIndex(p => p.id === selectedPartId);
+    if (partIndex === -1) return;
+
+    const part = localParts[partIndex];
+    
+    // Snap to nearest intersection
+    const snapped = snapToNearestIntersection(
+      part.x,
+      part.y,
+      part.dimensions.width,
+      part.dimensions.height
+    );
+
+    const newParts = [...localParts];
+    newParts[partIndex] = {
+      ...part,
+      x: snapped.x,
+      y: snapped.y,
+    };
+
+    setLocalParts(newParts);
+    
+    // Notify parent of update
+    if (onPartsUpdate) {
+      onPartsUpdate(newParts);
+    }
   };
 
   const handleRotatePart = () => {
@@ -413,7 +424,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
           Chipboard #{chipboardNumber}: {chipboard.name}
         </h3>
         <p className="text-sm text-gray-600">
-          {localParts.length} part{localParts.length !== 1 ? 's' : ''} placed • Click to select, drag to move, auto-snap to grid
+          {localParts.length} part{localParts.length !== 1 ? 's' : ''} placed • Click to select, drag to move, use "Snap to Grid" button
         </p>
       </div>
 
@@ -435,15 +446,28 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex justify-between items-start mb-3">
             <h4 className="font-semibold text-blue-900">Selected Part</h4>
-            <button
-              onClick={handleRotatePart}
-              className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 flex items-center gap-1"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Rotate 90°
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSnapToGrid}
+                className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 flex items-center gap-1"
+                title="Snap to nearest cut line intersection"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+                Snap to Grid
+              </button>
+              <button
+                onClick={handleRotatePart}
+                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 flex items-center gap-1"
+                title="Rotate part 90 degrees"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Rotate 90°
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>

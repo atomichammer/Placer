@@ -44,7 +44,7 @@ function PlacementView({ result, onResultUpdate }: PlacementViewProps) {
         <div className="p-4 bg-gradient-to-r from-purple-600 to-purple-700">
           <h2 className="text-2xl font-bold text-white">Placement Results</h2>
           <p className="text-purple-100 mt-1">
-            {localResult.chipboards.length} chipboard{localResult.chipboards.length !== 1 ? 's' : ''} used • Interactive: drag to move, click to select
+            {localResult.chipboards.length} chipboard{localResult.chipboards.length !== 1 ? 's' : ''} used • Interactive: drag parts, then snap to grid
           </p>
         </div>
 
