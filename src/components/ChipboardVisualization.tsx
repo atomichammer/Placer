@@ -20,14 +20,24 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [localParts, setLocalParts] = useState(chipboardWithParts.parts);
+  const previousPartsLengthRef = useRef(chipboardWithParts.parts.length);
 
   const { chipboard } = chipboardWithParts;
 
   // Update local parts when props change (e.g., new placement result)
   useEffect(() => {
+    const newPartsLength = chipboardWithParts.parts.length;
+    const partsLengthChanged = newPartsLength !== previousPartsLengthRef.current;
+    
     setLocalParts(chipboardWithParts.parts);
-    setSelectedPartId(null); // Clear selection when result updates
-    setDragState(null); // Clear drag state
+    
+    // Only clear selection if it's a completely new result (different number of parts)
+    // Don't clear if it's just position updates from manual adjustments
+    if (partsLengthChanged) {
+      setSelectedPartId(null);
+      setDragState(null);
+      previousPartsLengthRef.current = newPartsLength;
+    }
   }, [chipboardWithParts]);
 
   const getScaleAndOffset = (canvas: HTMLCanvasElement) => {
