@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ProjectPart } from '../types';
+import { ProjectPart, Chipboard } from '../types';
 
 interface PartsManagerProps {
   parts: ProjectPart[];
+  chipboard: Chipboard;
   onAddPart: (part: ProjectPart) => void;
   onUpdatePart: (partId: string, part: ProjectPart) => void;
   onDeletePart: (partId: string) => void;
@@ -13,6 +14,7 @@ interface PartsManagerProps {
 
 function PartsManager({
   parts,
+  chipboard,
   onAddPart,
   onUpdatePart,
   onDeletePart,
@@ -21,6 +23,7 @@ function PartsManager({
 }: PartsManagerProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   
   const [partName, setPartName] = useState('');
   const [partWidth, setPartWidth] = useState(100);
@@ -30,6 +33,33 @@ function PartsManager({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Calculate available chipboard dimensions (accounting for margins)
+    const availableWidth = chipboard.dimensions.width - 2 * chipboard.margin;
+    const availableHeight = chipboard.dimensions.height - 2 * chipboard.margin;
+    
+    // Check if part can fit in any orientation
+    const fitsNormal = partWidth <= availableWidth && partHeight <= availableHeight;
+    const fitsRotated = partCanRotate && partHeight <= availableWidth && partWidth <= availableHeight;
+    
+    if (!fitsNormal && !fitsRotated) {
+      // Part is too large to fit on the chipboard
+      const maxDimension = Math.max(availableWidth, availableHeight);
+      const maxPartDimension = Math.max(partWidth, partHeight);
+      
+      let errorMessage = `Part dimensions (${partWidth} × ${partHeight} mm) are too large for the chipboard!\n`;
+      errorMessage += `Available space: ${availableWidth} × ${availableHeight} mm`;
+      
+      if (maxPartDimension > maxDimension) {
+        errorMessage += `\nThe largest dimension (${maxPartDimension} mm) exceeds the chipboard's maximum (${maxDimension} mm).`;
+      }
+      
+      setValidationError(errorMessage);
+      return;
+    }
+    
+    // Clear any previous errors
+    setValidationError(null);
     
     const part: ProjectPart = {
       id: editingId || uuidv4(),
@@ -56,6 +86,7 @@ function PartsManager({
     setPartCanRotate(true);
     setPartCount(1);
     setShowAddForm(false);
+    setValidationError(null);
   };
 
   const handleEdit = (part: ProjectPart) => {
@@ -66,6 +97,12 @@ function PartsManager({
     setPartCount(part.count);
     setEditingId(part.id);
     setShowAddForm(true);
+    setValidationError(null);
+  };
+
+  const handleDimensionChange = (setter: (value: number) => void, value: number) => {
+    setter(value);
+    setValidationError(null); // Clear error when user changes dimensions
   };
 
   const totalParts = parts.reduce((sum, p) => sum + p.count, 0);
@@ -112,7 +149,7 @@ function PartsManager({
                 <input
                   type="number"
                   value={partWidth}
-                  onChange={(e) => setPartWidth(Number(e.target.value))}
+                  onChange={(e) => handleDimensionChange(setPartWidth, Number(e.target.value))}
                   min="1"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -125,7 +162,7 @@ function PartsManager({
                 <input
                   type="number"
                   value={partHeight}
-                  onChange={(e) => setPartHeight(Number(e.target.value))}
+                  onChange={(e) => handleDimensionChange(setPartHeight, Number(e.target.value))}
                   min="1"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -152,13 +189,27 @@ function PartsManager({
                 type="checkbox"
                 id="canRotate"
                 checked={partCanRotate}
-                onChange={(e) => setPartCanRotate(e.target.checked)}
+                onChange={(e) => {
+                  setPartCanRotate(e.target.checked);
+                  setValidationError(null); // Clear error when rotation setting changes
+                }}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
               <label htmlFor="canRotate" className="ml-2 text-sm text-gray-700">
                 Allow rotation
               </label>
             </div>
+
+            {validationError && (
+              <div className="bg-red-50 border border-red-400 text-red-800 px-3 py-2 rounded-lg text-sm">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <div className="whitespace-pre-line">{validationError}</div>
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button

@@ -107,6 +107,7 @@ function App() {
           <div className="lg:col-span-1">
             <PartsManager
               parts={project.parts}
+              chipboard={project.chipboard}
               onAddPart={handleAddPart}
               onUpdatePart={handleUpdatePart}
               onDeletePart={handleDeletePart}
