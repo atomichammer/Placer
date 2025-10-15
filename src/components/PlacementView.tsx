@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PlacementResult, PlacedPart, ProjectPart } from '../types';
 import ChipboardVisualization from './ChipboardVisualization';
 import Statistics from './Statistics';
@@ -14,6 +15,7 @@ interface PlacementViewProps {
 }
 
 function PlacementView({ result, sawThickness, projectName, projectParts, onResultUpdate }: PlacementViewProps) {
+  const { t } = useTranslation();
   const [selectedChipboardIndex, setSelectedChipboardIndex] = useState(0);
   const [localResult, setLocalResult] = useState(result);
   const [isExporting, setIsExporting] = useState(false);
@@ -106,9 +108,9 @@ function PlacementView({ result, sawThickness, projectName, projectParts, onResu
         <div className="p-4 bg-gradient-to-r from-purple-600 to-purple-700">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-bold text-white">Placement Results</h2>
+              <h2 className="text-2xl font-bold text-white">{t('placementView.title')}</h2>
               <p className="text-purple-100 mt-1">
-                {localResult.chipboards.length} chipboard{localResult.chipboards.length !== 1 ? 's' : ''} used • Interactive: drag parts, then snap to grid
+                {t('placementView.chipboardsUsed', { count: localResult.chipboards.length })} • {t('placementView.interactive')}
               </p>
             </div>
             <button
@@ -120,7 +122,7 @@ function PlacementView({ result, sawThickness, projectName, projectParts, onResu
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              {isExporting ? 'Exporting...' : 'Export PDF'}
+              {isExporting ? t('placementView.exporting') : t('placementView.exportPdf')}
             </button>
           </div>
         </div>

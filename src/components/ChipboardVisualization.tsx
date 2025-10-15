@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChipboardWithParts, PlacedPart } from '../types';
 
 interface ChipboardVisualizationProps {
@@ -17,6 +18,7 @@ interface DragState {
 }
 
 function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickness, onPartsUpdate }: ChipboardVisualizationProps) {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
@@ -587,20 +589,20 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
     <div className="space-y-4" data-chipboard-canvas>
       <div className="text-center">
         <h3 className="text-lg font-semibold text-gray-900">
-          Chipboard #{chipboardNumber}: {chipboard.name}
+          {t('placementView.chipboard')} #{chipboardNumber}: {chipboard.name}
         </h3>
         <p className="text-sm text-gray-600">
-          {localParts.length} part{localParts.length !== 1 ? 's' : ''} placed • Click to select, drag to move, use "Snap to Grid" button
+          {t('placementView.partsPlaced', { count: localParts.length })} • {t('placementView.clickToSelect')}
         </p>
         <div className="flex items-center justify-center gap-4 mt-2 text-xs text-gray-500">
           <span className="flex items-center gap-1">
-            <span className="w-4 h-0.5 bg-gray-300"></span> Grid lines
+            <span className="w-4 h-0.5 bg-gray-300"></span> {t('placementView.gridLines')}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-4 h-0.5 bg-red-300"></span> Actual cuts ({chipboardWithParts.cutLines.length})
+            <span className="w-4 h-0.5 bg-red-300"></span> {t('placementView.actualCuts', { count: chipboardWithParts.cutLines.length })}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-4 h-1 bg-gray-600"></span> PVC edges (inner outline)
+            <span className="w-4 h-1 bg-gray-600"></span> {t('placementView.pvcEdges')}
           </span>
         </div>
       </div>
@@ -622,7 +624,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
       {selectedPart && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex justify-between items-start mb-3">
-            <h4 className="font-semibold text-blue-900">Selected Part</h4>
+            <h4 className="font-semibold text-blue-900">{t('placementView.selectedPart')}</h4>
             <div className="flex gap-2">
               <button
                 onClick={handleSnapToGrid}
@@ -632,7 +634,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
-                Snap to Grid
+                {t('placementView.snapToGrid')}
               </button>
               <button
                 onClick={handleRotatePart}
@@ -642,27 +644,27 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                Rotate 90°
+                {t('placementView.rotate')}
               </button>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <span className="text-gray-600">Name:</span>{' '}
+              <span className="text-gray-600">{t('placementView.name')}:</span>{' '}
               <span className="font-medium">{selectedPart.name}</span>
             </div>
             <div>
-              <span className="text-gray-600">ID:</span>{' '}
+              <span className="text-gray-600">{t('placementView.id')}:</span>{' '}
               <span className="font-mono text-xs">{selectedPart.id.slice(0, 8)}</span>
             </div>
             <div>
-              <span className="text-gray-600">Dimensions:</span>{' '}
+              <span className="text-gray-600">{t('placementView.dimensions')}:</span>{' '}
               <span className="font-medium">
-                {Math.round(selectedPart.dimensions.width)} × {Math.round(selectedPart.dimensions.height)} mm
+                {Math.round(selectedPart.dimensions.width)} × {Math.round(selectedPart.dimensions.height)} {t('common.mm')}
               </span>
             </div>
             <div className="col-span-2">
-              <label className="block text-gray-600 mb-1">Position (mm):</label>
+              <label className="block text-gray-600 mb-1">{t('placementView.position')}:</label>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <label className="text-xs text-gray-500">X:</label>
@@ -689,12 +691,12 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                   className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 self-end"
                   title="Apply new coordinates"
                 >
-                  Apply
+                  {t('placementView.apply')}
                 </button>
               </div>
             </div>
             <div className="col-span-2">
-              <label className="block text-gray-600 mb-2 text-sm">PVC Edge Banding:</label>
+              <label className="block text-gray-600 mb-2 text-sm">{t('partsManager.pvcEdgeBanding')}:</label>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex items-center">
                   <input
@@ -705,7 +707,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-top" className="ml-2 text-sm text-gray-700">
-                    Top
+                    {t('partsManager.top')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -717,7 +719,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-right" className="ml-2 text-sm text-gray-700">
-                    Right
+                    {t('partsManager.right')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -729,7 +731,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-bottom" className="ml-2 text-sm text-gray-700">
-                    Bottom
+                    {t('partsManager.bottom')}
                   </label>
                 </div>
                 <div className="flex items-center">
@@ -741,7 +743,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-left" className="ml-2 text-sm text-gray-700">
-                    Left
+                    {t('partsManager.left')}
                   </label>
                 </div>
               </div>
@@ -749,7 +751,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
             {selectedPart.rotated && (
               <div className="col-span-2">
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  ↻ Rotated 90°
+                  ↻ {t('placementView.rotated')}
                 </span>
               </div>
             )}
@@ -758,7 +760,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
       )}
 
       <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-900 mb-3">Parts List</h4>
+        <h4 className="font-semibold text-gray-900 mb-3">{t('placementView.partsList')}</h4>
         <div className="space-y-2 max-h-60 overflow-y-auto">
           {localParts.map((part) => (
             <div
