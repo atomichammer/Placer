@@ -76,7 +76,6 @@ function drawChipboardLayout(
   // Draw parts (solid black outline)
   pdf.setDrawColor(0);
   pdf.setLineWidth(0.3);
-  pdf.setFontSize(7);
   
   for (const part of parts) {
     const x = offsetX + part.x * scale;
@@ -87,10 +86,20 @@ function drawChipboardLayout(
     // Draw part outline
     pdf.rect(x, y, w, h);
     
-    // Draw part name inside (centered)
+    // Draw part name and dimensions inside (centered)
     const textX = x + w / 2;
-    const textY = y + h / 2;
-    pdf.text(part.name, textX, textY, { align: 'center', baseline: 'middle' });
+    const centerY = y + h / 2;
+    
+    // Part name (bold)
+    pdf.setFontSize(7);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(part.name, textX, centerY - 1.5, { align: 'center', baseline: 'middle' });
+    
+    // Dimensions (normal)
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(6);
+    const dimensionsText = `${Math.round(part.dimensions.width)}×${Math.round(part.dimensions.height)}`;
+    pdf.text(dimensionsText, textX, centerY + 1.5, { align: 'center', baseline: 'middle' });
   }
 }
 
