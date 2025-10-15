@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Project, Chipboard, ProjectPart } from './types';
 import ProjectSetup from './components/ProjectSetup';
 import PartsManager from './components/PartsManager';
 import PlacementView from './components/PlacementView';
 import { optimizePlacement } from './utils/placement';
+import { exportProjectToCSV, importProjectFromCSV, downloadCSV } from './utils/projectIO';
 
 function App() {
   const [project, setProject] = useState<Project | null>(null);
   const [showSetup, setShowSetup] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCreateProject = (
     name: string,
@@ -73,10 +75,57 @@ function App() {
     setShowSetup(true);
   };
 
+  const handleSaveProject = () => {
+    if (!project) return;
+    
+    const csvContent = exportProjectToCSV(project);
+    const filename = `${project.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csvContent, filename);
+  };
+
+  const handleLoadProject = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const csvContent = e.target?.result as string;
+        const loadedProject = importProjectFromCSV(csvContent, uuidv4());
+        setProject(loadedProject);
+        setShowSetup(false);
+        
+        // Clear the file input so the same file can be loaded again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } catch (error) {
+        alert(`Error loading project: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   if (!project || showSetup) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
-        <ProjectSetup onCreateProject={handleCreateProject} />
+        <ProjectSetup 
+          onCreateProject={handleCreateProject}
+          onLoadProject={handleLoadProject}
+        />
+        
+        {/* Hidden file input for loading projects */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleFileSelected}
+          style={{ display: 'none' }}
+        />
       </div>
     );
   }
@@ -92,12 +141,35 @@ function App() {
                 Chipboard: {project.chipboard.name} | Saw thickness: {project.sawThickness}mm
               </p>
             </div>
-            <button
-              onClick={handleNewProject}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              New Project
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveProject}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                title="Save project to CSV"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                Save
+              </button>
+              <button
+                onClick={handleLoadProject}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                title="Load project from CSV"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Load
+              </button>
+              <button
+                onClick={handleNewProject}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                title="Create new project"
+              >
+                New Project
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -143,6 +215,15 @@ function App() {
           </div>
         </div>
       </main>
+      
+      {/* Hidden file input for loading projects */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleFileSelected}
+        style={{ display: 'none' }}
+      />
     </div>
   );
 }

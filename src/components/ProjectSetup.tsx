@@ -5,9 +5,10 @@ import { storageUtils } from '../utils/storage';
 
 interface ProjectSetupProps {
   onCreateProject: (name: string, sawThickness: number, chipboard: Chipboard) => void;
+  onLoadProject?: () => void;
 }
 
-function ProjectSetup({ onCreateProject }: ProjectSetupProps) {
+function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
   const [projectName, setProjectName] = useState('New Project');
   const [sawThickness, setSawThickness] = useState(3);
   const [selectedChipboard, setSelectedChipboard] = useState<Chipboard | null>(null);
@@ -57,7 +58,22 @@ function ProjectSetup({ onCreateProject }: ProjectSetupProps) {
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-xl p-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Placer</h1>
-        <p className="text-gray-600 mb-8">2D Rectangle Cutting Optimizer</p>
+        <p className="text-gray-600 mb-4">2D Rectangle Cutting Optimizer</p>
+
+        {onLoadProject && (
+          <div className="mb-6 pb-6 border-b border-gray-200">
+            <button
+              type="button"
+              onClick={onLoadProject}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 font-medium"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Load Existing Project from CSV
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
