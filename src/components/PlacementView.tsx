@@ -5,10 +5,11 @@ import Statistics from './Statistics';
 
 interface PlacementViewProps {
   result: PlacementResult;
+  sawThickness: number;
   onResultUpdate?: (result: PlacementResult) => void;
 }
 
-function PlacementView({ result, onResultUpdate }: PlacementViewProps) {
+function PlacementView({ result, sawThickness, onResultUpdate }: PlacementViewProps) {
   const [selectedChipboardIndex, setSelectedChipboardIndex] = useState(0);
   const [localResult, setLocalResult] = useState(result);
 
@@ -72,6 +73,7 @@ function PlacementView({ result, onResultUpdate }: PlacementViewProps) {
           <ChipboardVisualization
             chipboardWithParts={localResult.chipboards[selectedChipboardIndex]}
             chipboardNumber={selectedChipboardIndex + 1}
+            sawThickness={sawThickness}
             onPartsUpdate={(parts) => handlePartsUpdate(selectedChipboardIndex, parts)}
           />
         </div>

@@ -4,6 +4,7 @@ import { ChipboardWithParts, PlacedPart } from '../types';
 interface ChipboardVisualizationProps {
   chipboardWithParts: ChipboardWithParts;
   chipboardNumber: number;
+  sawThickness: number;
   onPartsUpdate?: (parts: PlacedPart[]) => void;
 }
 
@@ -15,7 +16,7 @@ interface DragState {
   offsetY: number;
 }
 
-function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUpdate }: ChipboardVisualizationProps) {
+function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickness, onPartsUpdate }: ChipboardVisualizationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
@@ -60,14 +61,17 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
     const verticalLines = new Set<number>([chipboard.margin]);
 
     // Collect all cut line positions (excluding the specified part if provided)
+    // Include saw thickness to account for the kerf between parts
     for (const part of localParts) {
       if (excludePartId && part.id === excludePartId) {
         continue; // Skip this part's cut lines
       }
-      horizontalLines.add(part.y);
-      horizontalLines.add(part.y + part.dimensions.height);
+      // Vertical lines (constant X): left and right edges
       verticalLines.add(part.x);
-      verticalLines.add(part.x + part.dimensions.width);
+      verticalLines.add(part.x + part.dimensions.width + sawThickness);
+      // Horizontal lines (constant Y): bottom and top edges
+      horizontalLines.add(part.y);
+      horizontalLines.add(part.y + part.dimensions.height + sawThickness);
     }
 
     // Generate all intersections
@@ -83,6 +87,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
       }
     }
 
+    console.log('Generated intersections (with saw thickness):', intersections.length);
     return intersections;
   };
 

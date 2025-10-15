@@ -228,6 +228,7 @@ function App() {
             {project.placementResult ? (
               <PlacementView 
                 result={project.placementResult}
+                sawThickness={project.sawThickness}
                 onResultUpdate={handlePlacementUpdate}
               />
             ) : (
