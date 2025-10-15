@@ -273,34 +273,36 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
         ctx.fillText('↻', x + 10, y + 15);
       }
 
-      // PVC edge indicators (green lines)
+      // PVC edge indicators (green lines inside the part)
       if (part.pvcEdges) {
         ctx.strokeStyle = '#10b981'; // green-500
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
         ctx.setLineDash([]);
+
+        const inset = 6; // Distance from edge in pixels
 
         if (part.pvcEdges.top) {
           ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + width, y);
+          ctx.moveTo(x + inset, y + inset);
+          ctx.lineTo(x + width - inset, y + inset);
           ctx.stroke();
         }
         if (part.pvcEdges.right) {
           ctx.beginPath();
-          ctx.moveTo(x + width, y);
-          ctx.lineTo(x + width, y + height);
+          ctx.moveTo(x + width - inset, y + inset);
+          ctx.lineTo(x + width - inset, y + height - inset);
           ctx.stroke();
         }
         if (part.pvcEdges.bottom) {
           ctx.beginPath();
-          ctx.moveTo(x, y + height);
-          ctx.lineTo(x + width, y + height);
+          ctx.moveTo(x + inset, y + height - inset);
+          ctx.lineTo(x + width - inset, y + height - inset);
           ctx.stroke();
         }
         if (part.pvcEdges.left) {
           ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x, y + height);
+          ctx.moveTo(x + inset, y + inset);
+          ctx.lineTo(x + inset, y + height - inset);
           ctx.stroke();
         }
       }
@@ -598,7 +600,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
             <span className="w-4 h-0.5 bg-red-300"></span> Actual cuts ({chipboardWithParts.cutLines.length})
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-4 h-1 bg-green-500"></span> PVC edges
+            <span className="w-4 h-1 bg-green-500"></span> PVC edges (inner outline)
           </span>
         </div>
       </div>

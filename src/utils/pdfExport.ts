@@ -101,22 +101,24 @@ function drawChipboardLayout(
     const dimensionsText = `${Math.round(part.dimensions.width)}×${Math.round(part.dimensions.height)}`;
     pdf.text(dimensionsText, textX, centerY + 1.5, { align: 'center', baseline: 'middle' });
     
-    // Draw PVC edges (thicker gray lines)
+    // Draw PVC edges (thicker gray lines inside the part)
     if (part.pvcEdges) {
-      pdf.setDrawColor(100);
-      pdf.setLineWidth(1);
+      pdf.setDrawColor(80);
+      pdf.setLineWidth(0.8);
+      
+      const inset = 1.5; // Distance from edge in mm
       
       if (part.pvcEdges.top) {
-        pdf.line(x, y, x + w, y);
+        pdf.line(x + inset, y + inset, x + w - inset, y + inset);
       }
       if (part.pvcEdges.right) {
-        pdf.line(x + w, y, x + w, y + h);
+        pdf.line(x + w - inset, y + inset, x + w - inset, y + h - inset);
       }
       if (part.pvcEdges.bottom) {
-        pdf.line(x, y + h, x + w, y + h);
+        pdf.line(x + inset, y + h - inset, x + w - inset, y + h - inset);
       }
       if (part.pvcEdges.left) {
-        pdf.line(x, y, x, y + h);
+        pdf.line(x + inset, y + inset, x + inset, y + h - inset);
       }
       
       // Reset to default
