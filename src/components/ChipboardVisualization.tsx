@@ -22,6 +22,8 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [localParts, setLocalParts] = useState(chipboardWithParts.parts);
   const previousPartsLengthRef = useRef(chipboardWithParts.parts.length);
+  const [editedX, setEditedX] = useState<string>('');
+  const [editedY, setEditedY] = useState<string>('');
 
   const { chipboard } = chipboardWithParts;
 
@@ -40,6 +42,20 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
       previousPartsLengthRef.current = newPartsLength;
     }
   }, [chipboardWithParts]);
+
+  // Update edited coordinates when selected part changes
+  useEffect(() => {
+    if (selectedPartId) {
+      const part = localParts.find(p => p.id === selectedPartId);
+      if (part) {
+        setEditedX(Math.round(part.x).toString());
+        setEditedY(Math.round(part.y).toString());
+      }
+    } else {
+      setEditedX('');
+      setEditedY('');
+    }
+  }, [selectedPartId, localParts]);
 
   const getScaleAndOffset = (canvas: HTMLCanvasElement) => {
     const padding = 40;
@@ -466,6 +482,47 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
     }
   };
 
+  const handleApplyCoordinates = () => {
+    if (!selectedPartId) return;
+
+    const partIndex = localParts.findIndex(p => p.id === selectedPartId);
+    if (partIndex === -1) return;
+
+    const part = localParts[partIndex];
+    const newX = parseFloat(editedX);
+    const newY = parseFloat(editedY);
+
+    // Validate inputs
+    if (isNaN(newX) || isNaN(newY)) {
+      alert('Please enter valid numbers for coordinates');
+      return;
+    }
+
+    // Check bounds
+    const minX = chipboard.margin;
+    const maxX = chipboard.dimensions.width - chipboard.margin - part.dimensions.width;
+    const minY = chipboard.margin;
+    const maxY = chipboard.dimensions.height - chipboard.margin - part.dimensions.height;
+
+    if (newX < minX || newX > maxX || newY < minY || newY > maxY) {
+      alert(`Coordinates out of bounds. Valid range:\nX: ${minX} to ${Math.round(maxX)}\nY: ${minY} to ${Math.round(maxY)}`);
+      return;
+    }
+
+    const newParts = [...localParts];
+    newParts[partIndex] = {
+      ...part,
+      x: newX,
+      y: newY,
+    };
+
+    setLocalParts(newParts);
+    
+    if (onPartsUpdate) {
+      onPartsUpdate(newParts);
+    }
+  };
+
   const selectedPart = localParts.find(p => p.id === selectedPartId);
 
   return (
@@ -543,11 +600,37 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                 {Math.round(selectedPart.dimensions.width)} × {Math.round(selectedPart.dimensions.height)} mm
               </span>
             </div>
-            <div>
-              <span className="text-gray-600">Position:</span>{' '}
-              <span className="font-medium">
-                ({Math.round(selectedPart.x)}, {Math.round(selectedPart.y)})
-              </span>
+            <div className="col-span-2">
+              <label className="block text-gray-600 mb-1">Position (mm):</label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <label className="text-xs text-gray-500">X:</label>
+                  <input
+                    type="number"
+                    value={editedX}
+                    onChange={(e) => setEditedX(e.target.value)}
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    placeholder="X"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-gray-500">Y:</label>
+                  <input
+                    type="number"
+                    value={editedY}
+                    onChange={(e) => setEditedY(e.target.value)}
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    placeholder="Y"
+                  />
+                </div>
+                <button
+                  onClick={handleApplyCoordinates}
+                  className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 self-end"
+                  title="Apply new coordinates"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
             {selectedPart.rotated && (
               <div className="col-span-2">
