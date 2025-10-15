@@ -5,6 +5,7 @@ import ProjectSetup from './components/ProjectSetup';
 import PartsManager from './components/PartsManager';
 import PlacementView from './components/PlacementView';
 import ProjectSettings from './components/ProjectSettings';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import { optimizePlacement } from './utils/placement';
 import { exportProjectToCSV, importProjectFromCSV, downloadCSV } from './utils/projectIO';
 
@@ -166,7 +167,9 @@ function App() {
                 Chipboard: {project.chipboard.name} | Saw: {project.sawThickness}mm | Margin: {project.chipboard.margin}mm
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3 items-center">
+              <LanguageSwitcher />
+              <div className="flex gap-2">
               <button
                 onClick={handleSaveProject}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
@@ -205,6 +208,7 @@ function App() {
               >
                 New Project
               </button>
+              </div>
             </div>
           </div>
         </div>

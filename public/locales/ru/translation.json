@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "Оптимизатор раскроя ДСП",
+    "newProject": "Новый проект",
+    "save": "Сохранить",
+    "load": "Загрузить",
+    "settings": "Настройки"
+  },
+  "projectSetup": {
+    "title": "Создать новый проект",
+    "projectName": "Название проекта",
+    "projectNamePlaceholder": "Мой мебельный проект",
+    "sawThickness": "Толщина пропила (мм)",
+    "chipboard": "Лист ДСП",
+    "selectFromLibrary": "Выбрать из библиотеки",
+    "orCreateNew": "или создать новый",
+    "chipboardName": "Название листа",
+    "width": "Ширина (мм)",
+    "height": "Высота (мм)",
+    "thickness": "Толщина (мм)",
+    "margin": "Отступ (мм)",
+    "createProject": "Создать проект",
+    "loadExisting": "Загрузить существующий проект из CSV"
+  },
+  "partsManager": {
+    "title": "Управление деталями",
+    "totalParts": "Всего деталей",
+    "addPart": "Добавить деталь",
+    "partName": "Название детали (опционально)",
+    "partNamePlaceholder": "например, Полка, Дверь...",
+    "width": "Ширина (мм)",
+    "height": "Высота (мм)",
+    "quantity": "Количество",
+    "allowRotation": "Разрешить поворот",
+    "pvcEdgeBanding": "Кромка ПВХ",
+    "top": "Сверху",
+    "right": "Справа",
+    "bottom": "Снизу",
+    "left": "Слева",
+    "cancel": "Отмена",
+    "add": "Добавить",
+    "update": "Обновить",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "runPlacement": "Запустить алгоритм размещения",
+    "noParts": "Детали еще не добавлены"
+  },
+  "placementView": {
+    "title": "Результаты размещения",
+    "chipboardsUsed": "использован {{count}} лист",
+    "chipboardsUsed_other": "использовано {{count}} листов",
+    "interactive": "Интерактивно: перетаскивайте детали, затем привязывайте к сетке",
+    "exportPdf": "Экспорт в PDF",
+    "exporting": "Экспорт...",
+    "chipboard": "Лист",
+    "partsPlaced": "размещена {{count}} деталь",
+    "partsPlaced_other": "размещено {{count}} деталей",
+    "clickToSelect": "Кликните для выбора, перетащите для перемещения, используйте кнопку \"Привязать к сетке\"",
+    "gridLines": "Линии сетки",
+    "actualCuts": "Реальные резы ({{count}})",
+    "pvcEdges": "Кромки ПВХ (внутренний контур)",
+    "selectedPart": "Выбранная деталь",
+    "snapToGrid": "Привязать к сетке",
+    "rotate": "Повернуть на 90°",
+    "name": "Название",
+    "id": "ID",
+    "dimensions": "Размеры",
+    "position": "Позиция (мм)",
+    "apply": "Применить",
+    "rotated": "Повернуто на 90°",
+    "partsList": "Список деталей",
+    "noPlacement": "Размещение еще не выполнено",
+    "noPlacementDesc": "Добавьте детали и нажмите \"Запустить алгоритм размещения\" для просмотра оптимизированной раскладки"
+  },
+  "statistics": {
+    "title": "Статистика",
+    "recalculate": "Пересчитать",
+    "totalParts": "Всего деталей",
+    "chipboardsUsed": "Использовано листов",
+    "totalCutLength": "Общая длина резов",
+    "cutOperations": "Операций резки",
+    "materialEfficiency": "Эффективность использования",
+    "pvcEdgeLength": "Длина кромки ПВХ"
+  },
+  "projectSettings": {
+    "title": "Настройки проекта",
+    "sawThickness": "Толщина пропила (мм)",
+    "chipboardMargin": "Отступ листа (мм)",
+    "marginHelp": "Расстояние от краев для обрезки",
+    "close": "Закрыть",
+    "saveChanges": "Сохранить изменения"
+  },
+  "common": {
+    "mm": "мм",
+    "yes": "Да",
+    "no": "Нет"
+  },
+  "validation": {
+    "partTooLarge": "Размеры детали ({{width}} × {{height}} мм) слишком велики для листа!",
+    "availableSpace": "Доступное пространство: {{width}} × {{height}} мм",
+    "largestDimension": "Наибольший размер ({{size}} мм) превышает максимальный размер листа ({{max}} мм).",
+    "invalidCoordinates": "Пожалуйста, введите корректные числа для координат",
+    "coordinatesOutOfBounds": "Координаты вне границ. Допустимый диапазон:\nX: {{minX}} до {{maxX}}\nY: {{minY}} до {{maxY}}",
+    "cannotRotate": "Невозможно повернуть: деталь выйдет за границы листа"
+  }
+}
+

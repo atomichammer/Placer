@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { Chipboard } from '../types';
 import { storageUtils } from '../utils/storage';
@@ -9,7 +10,8 @@ interface ProjectSetupProps {
 }
 
 function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
-  const [projectName, setProjectName] = useState('New Project');
+  const { t } = useTranslation();
+  const [projectName, setProjectName] = useState(t('projectSetup.projectNamePlaceholder'));
   const [sawThickness, setSawThickness] = useState(3);
   const [selectedChipboard, setSelectedChipboard] = useState<Chipboard | null>(null);
   const [showNewChipboard, setShowNewChipboard] = useState(false);
@@ -58,7 +60,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg shadow-xl p-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Placer</h1>
-        <p className="text-gray-600 mb-4">2D Rectangle Cutting Optimizer</p>
+        <p className="text-gray-600 mb-4">{t('app.title')}</p>
 
         {onLoadProject && (
           <div className="mb-6 pb-6 border-b border-gray-200">
@@ -70,7 +72,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
-              Load Existing Project from CSV
+              {t('projectSetup.loadExisting')}
             </button>
           </div>
         )}
@@ -78,20 +80,21 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Project Name
+              {t('projectSetup.projectName')}
             </label>
             <input
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder={t('projectSetup.projectNamePlaceholder')}
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Saw Thickness (mm)
+              {t('projectSetup.sawThickness')}
             </label>
             <input
               type="number"
@@ -107,14 +110,14 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="block text-sm font-medium text-gray-700">
-                Select Chipboard
+                {t('projectSetup.selectFromLibrary')}
               </label>
               <button
                 type="button"
                 onClick={() => setShowNewChipboard(!showNewChipboard)}
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
-                {showNewChipboard ? 'Cancel' : '+ New Chipboard'}
+                {showNewChipboard ? t('partsManager.cancel') : `+ ${t('projectSetup.orCreateNew')}`}
               </button>
             </div>
 
@@ -122,14 +125,14 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
               <div className="bg-gray-50 p-4 rounded-lg space-y-4">
                 <input
                   type="text"
-                  placeholder="Chipboard name"
+                  placeholder={t('projectSetup.chipboardName')}
                   value={newChipboardName}
                   onChange={(e) => setNewChipboardName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Width (mm)</label>
+                    <label className="block text-xs text-gray-600 mb-1">{t('projectSetup.width')}</label>
                     <input
                       type="number"
                       value={newChipboardWidth}
@@ -138,7 +141,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Height (mm)</label>
+                    <label className="block text-xs text-gray-600 mb-1">{t('projectSetup.height')}</label>
                     <input
                       type="number"
                       value={newChipboardHeight}
@@ -147,7 +150,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Thickness (mm)</label>
+                    <label className="block text-xs text-gray-600 mb-1">{t('projectSetup.thickness')}</label>
                     <input
                       type="number"
                       value={newChipboardThickness}
@@ -156,7 +159,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Margin (mm)</label>
+                    <label className="block text-xs text-gray-600 mb-1">{t('projectSetup.margin')}</label>
                     <input
                       type="number"
                       value={newChipboardMargin}
@@ -171,7 +174,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
                   disabled={!newChipboardName}
                   className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  Create Chipboard
+                  {t('projectSetup.chipboard')}
                 </button>
               </div>
             ) : (
@@ -202,7 +205,7 @@ function ProjectSetup({ onCreateProject, onLoadProject }: ProjectSetupProps) {
             disabled={!selectedChipboard}
             className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium text-lg transition-colors"
           >
-            Create Project
+            {t('projectSetup.createProject')}
           </button>
         </form>
       </div>

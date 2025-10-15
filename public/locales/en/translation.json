@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "Chipboard Cutting Optimizer",
+    "newProject": "New Project",
+    "save": "Save",
+    "load": "Load",
+    "settings": "Settings"
+  },
+  "projectSetup": {
+    "title": "Create New Project",
+    "projectName": "Project Name",
+    "projectNamePlaceholder": "My Furniture Project",
+    "sawThickness": "Saw Thickness (mm)",
+    "chipboard": "Chipboard",
+    "selectFromLibrary": "Select from Library",
+    "orCreateNew": "or Create New",
+    "chipboardName": "Chipboard Name",
+    "width": "Width (mm)",
+    "height": "Height (mm)",
+    "thickness": "Thickness (mm)",
+    "margin": "Margin (mm)",
+    "createProject": "Create Project",
+    "loadExisting": "Load Existing Project from CSV"
+  },
+  "partsManager": {
+    "title": "Parts Manager",
+    "totalParts": "Total Parts",
+    "addPart": "Add Part",
+    "partName": "Part Name (optional)",
+    "partNamePlaceholder": "e.g., Shelf, Door...",
+    "width": "Width (mm)",
+    "height": "Height (mm)",
+    "quantity": "Quantity",
+    "allowRotation": "Allow rotation",
+    "pvcEdgeBanding": "PVC Edge Banding",
+    "top": "Top",
+    "right": "Right",
+    "bottom": "Bottom",
+    "left": "Left",
+    "cancel": "Cancel",
+    "add": "Add",
+    "update": "Update",
+    "edit": "Edit",
+    "delete": "Delete",
+    "runPlacement": "Run Placement Algorithm",
+    "noParts": "No parts added yet"
+  },
+  "placementView": {
+    "title": "Placement Results",
+    "chipboardsUsed": "{{count}} chipboard used",
+    "chipboardsUsed_other": "{{count}} chipboards used",
+    "interactive": "Interactive: drag parts, then snap to grid",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting...",
+    "chipboard": "Chipboard",
+    "partsPlaced": "{{count}} part placed",
+    "partsPlaced_other": "{{count}} parts placed",
+    "clickToSelect": "Click to select, drag to move, use \"Snap to Grid\" button",
+    "gridLines": "Grid lines",
+    "actualCuts": "Actual cuts ({{count}})",
+    "pvcEdges": "PVC edges (inner outline)",
+    "selectedPart": "Selected Part",
+    "snapToGrid": "Snap to Grid",
+    "rotate": "Rotate 90°",
+    "name": "Name",
+    "id": "ID",
+    "dimensions": "Dimensions",
+    "position": "Position (mm)",
+    "apply": "Apply",
+    "rotated": "Rotated 90°",
+    "partsList": "Parts List",
+    "noPlacement": "No placement yet",
+    "noPlacementDesc": "Add parts and click \"Run Placement Algorithm\" to see the optimized layout"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "recalculate": "Recalculate",
+    "totalParts": "Total Parts",
+    "chipboardsUsed": "Chipboards Used",
+    "totalCutLength": "Total Cut Length",
+    "cutOperations": "Cut Operations",
+    "materialEfficiency": "Material Efficiency",
+    "pvcEdgeLength": "PVC Edge Length"
+  },
+  "projectSettings": {
+    "title": "Project Settings",
+    "sawThickness": "Saw Thickness (mm)",
+    "chipboardMargin": "Chipboard Margin (mm)",
+    "marginHelp": "Distance from edges to cut off",
+    "close": "Close",
+    "saveChanges": "Save Changes"
+  },
+  "common": {
+    "mm": "mm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "validation": {
+    "partTooLarge": "Part dimensions ({{width}} × {{height}} mm) are too large for the chipboard!",
+    "availableSpace": "Available space: {{width}} × {{height}} mm",
+    "largestDimension": "The largest dimension ({{size}} mm) exceeds the chipboard's maximum ({{max}} mm).",
+    "invalidCoordinates": "Please enter valid numbers for coordinates",
+    "coordinatesOutOfBounds": "Coordinates out of bounds. Valid range:\nX: {{minX}} to {{maxX}}\nY: {{minY}} to {{maxY}}",
+    "cannotRotate": "Cannot rotate: part would exceed chipboard bounds"
+  }
+}
+
