@@ -229,6 +229,8 @@ function App() {
               <PlacementView 
                 result={project.placementResult}
                 sawThickness={project.sawThickness}
+                projectName={project.name}
+                projectParts={project.parts}
                 onResultUpdate={handlePlacementUpdate}
               />
             ) : (

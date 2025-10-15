@@ -526,7 +526,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
   const selectedPart = localParts.find(p => p.id === selectedPartId);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-chipboard-canvas>
       <div className="text-center">
         <h3 className="text-lg font-semibold text-gray-900">
           Chipboard #{chipboardNumber}: {chipboard.name}
