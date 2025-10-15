@@ -555,6 +555,30 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
     }
   };
 
+  const handlePvcEdgeChange = (edge: 'top' | 'right' | 'bottom' | 'left', checked: boolean) => {
+    if (!selectedPartId) return;
+    
+    const partIndex = localParts.findIndex(p => p.id === selectedPartId);
+    if (partIndex === -1) return;
+
+    const newParts = [...localParts];
+    const currentEdges = newParts[partIndex].pvcEdges || { top: false, right: false, bottom: false, left: false };
+    
+    newParts[partIndex] = {
+      ...newParts[partIndex],
+      pvcEdges: {
+        ...currentEdges,
+        [edge]: checked,
+      },
+    };
+
+    setLocalParts(newParts);
+    
+    if (onPartsUpdate) {
+      onPartsUpdate(newParts);
+    }
+  };
+
   const selectedPart = localParts.find(p => p.id === selectedPartId);
 
   return (
@@ -665,6 +689,59 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                 >
                   Apply
                 </button>
+              </div>
+            </div>
+            <div className="col-span-2">
+              <label className="block text-gray-600 mb-2 text-sm">PVC Edge Banding:</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="edit-pvc-top"
+                    checked={selectedPart.pvcEdges?.top || false}
+                    onChange={(e) => handlePvcEdgeChange('top', e.target.checked)}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="edit-pvc-top" className="ml-2 text-sm text-gray-700">
+                    Top
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="edit-pvc-right"
+                    checked={selectedPart.pvcEdges?.right || false}
+                    onChange={(e) => handlePvcEdgeChange('right', e.target.checked)}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="edit-pvc-right" className="ml-2 text-sm text-gray-700">
+                    Right
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="edit-pvc-bottom"
+                    checked={selectedPart.pvcEdges?.bottom || false}
+                    onChange={(e) => handlePvcEdgeChange('bottom', e.target.checked)}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="edit-pvc-bottom" className="ml-2 text-sm text-gray-700">
+                    Bottom
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="edit-pvc-left"
+                    checked={selectedPart.pvcEdges?.left || false}
+                    onChange={(e) => handlePvcEdgeChange('left', e.target.checked)}
+                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="edit-pvc-left" className="ml-2 text-sm text-gray-700">
+                    Left
+                  </label>
+                </div>
               </div>
             </div>
             {selectedPart.rotated && (
