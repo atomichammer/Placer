@@ -269,13 +269,13 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
       // Rotation indicator
       if (part.rotated) {
         ctx.fillStyle = '#10b981';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('↻', x + 10, y + 15);
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillText('↻', x + 18, y + 25);
       }
 
-      // PVC edge indicators (green lines inside the part)
+      // PVC edge indicators (dark gray lines inside the part)
       if (part.pvcEdges) {
-        ctx.strokeStyle = '#10b981'; // green-500
+        ctx.strokeStyle = '#4b5563'; // gray-600
         ctx.lineWidth = 3;
         ctx.setLineDash([]);
 
@@ -600,7 +600,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
             <span className="w-4 h-0.5 bg-red-300"></span> Actual cuts ({chipboardWithParts.cutLines.length})
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-4 h-1 bg-green-500"></span> PVC edges (inner outline)
+            <span className="w-4 h-1 bg-gray-600"></span> PVC edges (inner outline)
           </span>
         </div>
       </div>
@@ -702,7 +702,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     id="edit-pvc-top"
                     checked={selectedPart.pvcEdges?.top || false}
                     onChange={(e) => handlePvcEdgeChange('top', e.target.checked)}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-top" className="ml-2 text-sm text-gray-700">
                     Top
@@ -714,7 +714,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     id="edit-pvc-right"
                     checked={selectedPart.pvcEdges?.right || false}
                     onChange={(e) => handlePvcEdgeChange('right', e.target.checked)}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-right" className="ml-2 text-sm text-gray-700">
                     Right
@@ -726,7 +726,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     id="edit-pvc-bottom"
                     checked={selectedPart.pvcEdges?.bottom || false}
                     onChange={(e) => handlePvcEdgeChange('bottom', e.target.checked)}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-bottom" className="ml-2 text-sm text-gray-700">
                     Bottom
@@ -738,7 +738,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
                     id="edit-pvc-left"
                     checked={selectedPart.pvcEdges?.left || false}
                     onChange={(e) => handlePvcEdgeChange('left', e.target.checked)}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="edit-pvc-left" className="ml-2 text-sm text-gray-700">
                     Left

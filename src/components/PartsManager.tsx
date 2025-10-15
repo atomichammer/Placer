@@ -229,7 +229,7 @@ function PartsManager({
                     id="pvc-top"
                     checked={formData.pvcEdges.top}
                     onChange={(e) => updatePvcEdges({ top: e.target.checked })}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-top" className="ml-2 text-sm text-gray-700">
                     Top
@@ -241,7 +241,7 @@ function PartsManager({
                     id="pvc-right"
                     checked={formData.pvcEdges.right}
                     onChange={(e) => updatePvcEdges({ right: e.target.checked })}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-right" className="ml-2 text-sm text-gray-700">
                     Right
@@ -253,7 +253,7 @@ function PartsManager({
                     id="pvc-bottom"
                     checked={formData.pvcEdges.bottom}
                     onChange={(e) => updatePvcEdges({ bottom: e.target.checked })}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-bottom" className="ml-2 text-sm text-gray-700">
                     Bottom
@@ -265,7 +265,7 @@ function PartsManager({
                     id="pvc-left"
                     checked={formData.pvcEdges.left}
                     onChange={(e) => updatePvcEdges({ left: e.target.checked })}
-                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+                    className="w-4 h-4 text-gray-600 rounded focus:ring-gray-500"
                   />
                   <label htmlFor="pvc-left" className="ml-2 text-sm text-gray-700">
                     Left
