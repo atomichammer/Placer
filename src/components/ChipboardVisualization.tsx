@@ -55,12 +55,15 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
     return { scale, offsetX, offsetY };
   };
 
-  const getCutLineIntersections = (): { x: number; y: number }[] => {
+  const getCutLineIntersections = (excludePartId?: string): { x: number; y: number }[] => {
     const horizontalLines = new Set<number>([chipboard.margin]);
     const verticalLines = new Set<number>([chipboard.margin]);
 
-    // Collect all cut line positions
+    // Collect all cut line positions (excluding the specified part if provided)
     for (const part of localParts) {
+      if (excludePartId && part.id === excludePartId) {
+        continue; // Skip this part's cut lines
+      }
       horizontalLines.add(part.y);
       horizontalLines.add(part.y + part.dimensions.height);
       verticalLines.add(part.x);
@@ -83,8 +86,8 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
     return intersections;
   };
 
-  const snapToNearestIntersection = (x: number, y: number, partWidth: number, partHeight: number) => {
-    const intersections = getCutLineIntersections();
+  const snapToNearestIntersection = (x: number, y: number, partWidth: number, partHeight: number, excludePartId?: string) => {
+    const intersections = getCutLineIntersections(excludePartId);
 
     let bestSnap = { x, y };
     let bestDistance = Infinity;
@@ -378,12 +381,13 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
     const part = localParts[partIndex];
     console.log('Current part position:', part.x, part.y);
     
-    // Snap to nearest intersection
+    // Snap to nearest intersection (excluding this part's own cut lines)
     const snapped = snapToNearestIntersection(
       part.x,
       part.y,
       part.dimensions.width,
-      part.dimensions.height
+      part.dimensions.height,
+      selectedPartId // Exclude this part's cut lines
     );
 
     console.log('Snapped position:', snapped.x, snapped.y);
