@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlacementResult, PlacedPart } from '../types';
 import ChipboardVisualization from './ChipboardVisualization';
 import Statistics from './Statistics';
@@ -11,6 +11,11 @@ interface PlacementViewProps {
 function PlacementView({ result, onResultUpdate }: PlacementViewProps) {
   const [selectedChipboardIndex, setSelectedChipboardIndex] = useState(0);
   const [localResult, setLocalResult] = useState(result);
+
+  // Update local result when parent result changes (e.g., recalculation)
+  useEffect(() => {
+    setLocalResult(result);
+  }, [result]);
 
   const handlePartsUpdate = (chipboardIndex: number, updatedParts: PlacedPart[]) => {
     const newChipboards = [...localResult.chipboards];

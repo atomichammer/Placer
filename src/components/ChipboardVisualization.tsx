@@ -23,10 +23,12 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
 
   const { chipboard } = chipboardWithParts;
 
-  // Update local parts when props change
+  // Update local parts when props change (e.g., new placement result)
   useEffect(() => {
     setLocalParts(chipboardWithParts.parts);
-  }, [chipboardWithParts.parts]);
+    setSelectedPartId(null); // Clear selection when result updates
+    setDragState(null); // Clear drag state
+  }, [chipboardWithParts]);
 
   const getScaleAndOffset = (canvas: HTMLCanvasElement) => {
     const padding = 40;
@@ -73,16 +75,19 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
 
   const snapToNearestIntersection = (x: number, y: number, partWidth: number, partHeight: number) => {
     const intersections = getCutLineIntersections();
-    const snapThreshold = 50; // pixels in world coordinates
+    const snapThreshold = 100; // mm in world coordinates (increased for better snapping)
 
     let bestSnap = { x, y };
     let bestDistance = Infinity;
 
     for (const intersection of intersections) {
       // Check if part would fit at this intersection
-      if (intersection.x + partWidth <= chipboard.dimensions.width - chipboard.margin &&
-          intersection.y + partHeight <= chipboard.dimensions.height - chipboard.margin) {
-        
+      const fitsHorizontally = intersection.x >= chipboard.margin && 
+                               intersection.x + partWidth <= chipboard.dimensions.width - chipboard.margin;
+      const fitsVertically = intersection.y >= chipboard.margin && 
+                            intersection.y + partHeight <= chipboard.dimensions.height - chipboard.margin;
+      
+      if (fitsHorizontally && fitsVertically) {
         const distance = Math.sqrt(
           Math.pow(intersection.x - x, 2) + Math.pow(intersection.y - y, 2)
         );
@@ -408,7 +413,7 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, onPartsUp
           Chipboard #{chipboardNumber}: {chipboard.name}
         </h3>
         <p className="text-sm text-gray-600">
-          {localParts.length} part{localParts.length !== 1 ? 's' : ''} placed • Click to select, drag to move
+          {localParts.length} part{localParts.length !== 1 ? 's' : ''} placed • Click to select, drag to move, auto-snap to grid
         </p>
       </div>
 
