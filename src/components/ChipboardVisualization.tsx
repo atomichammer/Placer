@@ -194,6 +194,20 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
       }
     }
 
+    // Draw actual cut lines (pale red) - these are used for statistics
+    if (chipboardWithParts.cutLines && chipboardWithParts.cutLines.length > 0) {
+      ctx.strokeStyle = '#fca5a5'; // pale red (red-300)
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+
+      for (const cutLine of chipboardWithParts.cutLines) {
+        ctx.beginPath();
+        ctx.moveTo(offsetX + cutLine.x1 * scale, offsetY + cutLine.y1 * scale);
+        ctx.lineTo(offsetX + cutLine.x2 * scale, offsetY + cutLine.y2 * scale);
+        ctx.stroke();
+      }
+    }
+
     // Generate colors for parts
     const colors = generateColors(localParts.length);
 
@@ -463,6 +477,14 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
         <p className="text-sm text-gray-600">
           {localParts.length} part{localParts.length !== 1 ? 's' : ''} placed • Click to select, drag to move, use "Snap to Grid" button
         </p>
+        <div className="flex items-center justify-center gap-4 mt-2 text-xs text-gray-500">
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-0.5 bg-gray-300"></span> Grid lines
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-4 h-0.5 bg-red-300"></span> Actual cuts ({chipboardWithParts.cutLines.length})
+          </span>
+        </div>
       </div>
 
       <div className="border border-gray-300 rounded-lg overflow-hidden bg-white">
