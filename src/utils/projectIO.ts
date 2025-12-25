@@ -93,13 +93,13 @@ export function importProjectFromCSV(csvContent: string, projectId: string): Pro
           width: parseFloat(values[2]),
           height: parseFloat(values[3]),
         },
-        canRotate: values[4] === 'true',
+        canRotate: values[4] === '1',
         count: parseInt(values[5], 10),
         pvcEdges: {
-          top: values[6] === 'true',
-          right: values[7] === 'true',
-          bottom: values[8] === 'true',
-          left: values[9] === 'true',
+          top: values[6] === '1',
+          right: values[7] === '1',
+          bottom: values[8] === '1',
+          left: values[9] === '1',
         },
       };
       parts.push(part);

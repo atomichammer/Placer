@@ -52,13 +52,24 @@ export interface PlacedPart {
   x: number;
   y: number;
   rotated: boolean;
+  canRotate: boolean;
   pvcEdges?: PvcEdges;
+}
+
+export interface Remainder {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  area: number;
+  createdFrom: string;
 }
 
 export interface ChipboardWithParts {
   chipboard: Chipboard;
   parts: PlacedPart[];
   cutLines: CutLine[];
+  remainders?: Remainder[];
 }
 
 export interface CutLine {

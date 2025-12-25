@@ -7,6 +7,7 @@ interface ChipboardVisualizationProps {
   chipboardNumber: number;
   sawThickness: number;
   onPartsUpdate?: (parts: PlacedPart[]) => void;
+  selectedRemainderIndex?: number | null;
 }
 
 interface DragState {
@@ -17,7 +18,7 @@ interface DragState {
   offsetY: number;
 }
 
-function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickness, onPartsUpdate }: ChipboardVisualizationProps) {
+function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickness, onPartsUpdate, selectedRemainderIndex }: ChipboardVisualizationProps) {
   const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedPartId, setSelectedPartId] = useState<string | null>(null);
@@ -275,6 +276,15 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
         ctx.fillText('↻', x + 18, y + 25);
       }
 
+      // Lock icon for non-rotatable parts
+      if (part.canRotate === false) {
+        ctx.fillStyle = '#6b7280'; // gray-500
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('🔒', x + 4, y + 4);
+      }
+
       // PVC edge indicators (dark gray lines inside the part)
       if (part.pvcEdges) {
         ctx.strokeStyle = '#4b5563'; // gray-600
@@ -319,6 +329,42 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
       }
     });
 
+    // Draw remainders (non-interactive, visual only)
+    if (chipboardWithParts.remainders && chipboardWithParts.remainders.length > 0) {
+      chipboardWithParts.remainders.forEach((remainder, index) => {
+        const x = offsetX + remainder.x * scale;
+        const y = offsetY + remainder.y * scale;
+        const width = remainder.width * scale;
+        const height = remainder.height * scale;
+
+        const isSelected = selectedRemainderIndex === index;
+
+        // Fill remainder with a light pattern
+        ctx.fillStyle = isSelected ? 'rgba(59, 130, 246, 0.2)' : 'rgba(200, 200, 200, 0.1)';
+        ctx.fillRect(x, y, width, height);
+
+        // Border
+        ctx.strokeStyle = isSelected ? '#3b82f6' : '#9ca3af';
+        ctx.lineWidth = isSelected ? 2 : 1;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeRect(x, y, width, height);
+        ctx.setLineDash([]);
+
+        // Label (only if large enough)
+        if (width > 50 && height > 30) {
+          ctx.fillStyle = isSelected ? '#1e40af' : '#6b7280';
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(
+            `${Math.round(remainder.width)}×${Math.round(remainder.height)}`,
+            x + width / 2,
+            y + height / 2
+          );
+        }
+      });
+    }
+
     // Draw dimensions
     ctx.fillStyle = '#374151';
     ctx.font = '14px sans-serif';
@@ -337,15 +383,20 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
 
   useEffect(() => {
     drawCanvas();
-  }, [chipboard, localParts, selectedPartId, dragState]);
+  }, [chipboard, localParts, selectedPartId, dragState, selectedRemainderIndex, chipboardWithParts.remainders]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    
+    // Account for CSS scaling - canvas internal size vs CSS size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
     const { scale, offsetX, offsetY } = getScaleAndOffset(canvas);
 
@@ -387,8 +438,13 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    
+    // Account for CSS scaling - canvas internal size vs CSS size
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
     const { scale, offsetX, offsetY } = getScaleAndOffset(canvas);
 
@@ -758,30 +814,6 @@ function ChipboardVisualization({ chipboardWithParts, chipboardNumber, sawThickn
           </div>
         </div>
       )}
-
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-900 mb-3">{t('placementView.partsList')}</h4>
-        <div className="space-y-2 max-h-60 overflow-y-auto">
-          {localParts.map((part) => (
-            <div
-              key={part.id}
-              onClick={() => setSelectedPartId(selectedPartId === part.id ? null : part.id)}
-              className={`p-2 rounded cursor-pointer transition-colors ${
-                selectedPartId === part.id
-                  ? 'bg-blue-100 border border-blue-300'
-                  : 'bg-white border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-sm">{part.name}</span>
-                <span className="text-xs text-gray-600">
-                  {Math.round(part.dimensions.width)} × {Math.round(part.dimensions.height)} mm
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

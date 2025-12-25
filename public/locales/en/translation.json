@@ -69,6 +69,8 @@
     "apply": "Apply",
     "rotated": "Rotated 90°",
     "partsList": "Parts List",
+    "remaindersList": "Remainders",
+    "recalculateLayout": "Recalculate Layout",
     "noPlacement": "No placement yet",
     "noPlacementDesc": "Add parts and click \"Run Placement Algorithm\" to see the optimized layout"
   },
